@@ -109,6 +109,8 @@ pub struct ForecastStrip {
 	pub longitude: f32,
 	pub timezone: String,
 	pub hours: Vec<HourForecast>,
+	pub sunrise: Option<String>,
+	pub sunset: Option<String>,
 }
 
 pub fn forecast_source_from_env() -> ForecastSource {
@@ -143,12 +145,20 @@ pub fn mock_preset_names() -> &'static [&'static str] {
 	]
 }
 
+
 #[derive(Debug, Deserialize)]
 struct OpenMeteoResponse {
 	latitude: f32,
 	longitude: f32,
 	timezone: String,
 	hourly: OpenMeteoHourly,
+	daily: Option<OpenMeteoDaily>,
+}
+
+#[derive(Debug, Deserialize)]
+struct OpenMeteoDaily {
+	sunrise: Vec<String>,
+	sunset: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -191,7 +201,7 @@ pub fn fetch_open_meteo_forecast(
 	let tz = timezone.replace('/', "%2F");
 	let forecast_hours = hours.clamp(2, 48);
 	let url = format!(
-		"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m,wind_speed_10m,precipitation_probability,relative_humidity_2m,surface_pressure,visibility,uv_index,weather_code&timezone={tz}&forecast_hours={forecast_hours}"
+		"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m,wind_speed_10m,precipitation_probability,relative_humidity_2m,surface_pressure,visibility,uv_index,weather_code&daily=sunrise,sunset&timezone={tz}&forecast_hours={forecast_hours}"
 	);
 
 	let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
@@ -219,10 +229,23 @@ pub fn fetch_open_meteo_forecast(
 	let count = hours.min(available);
 	let mut entries = Vec::with_capacity(count);
 
+	// Use the first sunrise/sunset for today (if available)
+	let (sunrise, sunset) = if let Some(daily) = &payload.daily {
+		(
+			daily.sunrise.get(0).cloned(),
+			daily.sunset.get(0).cloned(),
+		)
+	} else {
+		(None, None)
+	};
+
 	for index in 0..count {
 		let weather_code = payload.hourly.weather_code[index];
 		let time_iso = payload.hourly.time[index].clone();
-		let day_phase = DayPhase::from_time_iso(&time_iso);
+		let day_phase = match (&sunrise, &sunset) {
+			(Some(sr), Some(ss)) => DayPhase::from_time_iso_with_sun(&time_iso, sr, ss),
+			_ => DayPhase::from_time_iso(&time_iso),
+		};
 		let condition = WeatherCondition::from_weather_code(weather_code);
 		entries.push(HourForecast {
 			time_iso,
@@ -240,11 +263,23 @@ pub fn fetch_open_meteo_forecast(
 		});
 	}
 
+	// Use the first sunrise/sunset for today (if available)
+	let (sunrise, sunset) = if let Some(daily) = &payload.daily {
+		(
+			daily.sunrise.get(0).cloned(),
+			daily.sunset.get(0).cloned(),
+		)
+	} else {
+		(None, None)
+	};
+
 	Ok(ForecastStrip {
 		latitude: payload.latitude,
 		longitude: payload.longitude,
 		timezone: payload.timezone,
 		hours: entries,
+		sunrise,
+		sunset,
 	})
 }
 
@@ -280,6 +315,8 @@ pub fn demo_forecast() -> ForecastStrip {
 		longitude: 0.0,
 		timezone: "demo".to_owned(),
 		hours,
+		sunrise: None,
+		sunset: None,
 	}
 }
 
@@ -358,6 +395,8 @@ pub fn load_mock_forecast_from_env() -> Result<ForecastStrip, Box<dyn Error>> {
 			"mock/day".to_owned()
 		},
 		hours: entries,
+		sunrise: None,
+		sunset: None,
 	})
 }
 

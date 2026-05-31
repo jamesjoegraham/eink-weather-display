@@ -156,26 +156,41 @@ pub fn render_dashboard_svg(
         })
         .collect();
 
-    // Compute connectors between adjacent hours for sunrise/dusk transitions
+    // Compute connectors using real sunrise/sunset times if available
     let mut connectors = Vec::new();
-    for i in 0..(selected_hours.len() - 1) {
-        let h1 = selected_hours[i];
-        let h2 = selected_hours[i + 1];
-        if h1.day_phase != h2.day_phase {
-            // Determine if this is sunrise or dusk
-            let (from, to) = (h1.day_phase, h2.day_phase);
-            let kind = if from.is_night() && to.is_day() {
-                "sunrise"
-            } else if from.is_day() && to.is_night() {
-                "dusk"
-            } else {
-                continue;
-            };
-            connectors.push(context! {
-                index => i,
-                kind => kind,
-            });
+    let sunrise = &forecast.sunrise;
+    let sunset = &forecast.sunset;
+    // Find the first hour after sunrise and after sunset, but only if the event is within the selected range
+    let first_time = selected_hours.first().map(|h| &h.time_iso);
+    let last_time = selected_hours.last().map(|h| &h.time_iso);
+
+    let sunrise_index = sunrise.as_ref().and_then(|sr| {
+        if let (Some(first), Some(last)) = (first_time, last_time) {
+            if sr >= first && sr <= last {
+                return selected_hours.iter().position(|h| &h.time_iso >= sr);
+            }
         }
+        None
+    });
+    let sunset_index = sunset.as_ref().and_then(|ss| {
+        if let (Some(first), Some(last)) = (first_time, last_time) {
+            if ss >= first && ss <= last {
+                return selected_hours.iter().position(|h| &h.time_iso >= ss);
+            }
+        }
+        None
+    });
+    if let Some(i) = sunrise_index {
+        connectors.push(context! {
+            index => i.saturating_sub(1),
+            kind => "sunrise",
+        });
+    }
+    if let Some(i) = sunset_index {
+        connectors.push(context! {
+            index => i.saturating_sub(1),
+            kind => "dusk",
+        });
     }
 
     let current_humidity = current.map(|h| h.humidity_percent).unwrap_or(0);

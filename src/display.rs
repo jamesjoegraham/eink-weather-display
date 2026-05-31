@@ -27,6 +27,7 @@ pub enum WeatherCondition {
     HeavyFog,
 }
 
+
 impl DayPhase {
     pub fn from_time_iso(time_iso: &str) -> Self {
         let hour = time_iso
@@ -34,8 +35,16 @@ impl DayPhase {
             .and_then(|(_, hhmm)| hhmm.get(0..2))
             .and_then(|hh| hh.parse::<u8>().ok())
             .unwrap_or(12);
-
         if (6..18).contains(&hour) {
+            DayPhase::Day
+        } else {
+            DayPhase::Night
+        }
+    }
+
+    pub fn from_time_iso_with_sun(time_iso: &str, sunrise: &str, sunset: &str) -> Self {
+        // Compare ISO strings directly (YYYY-MM-DDTHH:MM)
+        if time_iso >= sunrise && time_iso < sunset {
             DayPhase::Day
         } else {
             DayPhase::Night
