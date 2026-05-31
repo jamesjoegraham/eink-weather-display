@@ -1,0 +1,8 @@
+{% macro metric_card(m) -%}
+<rect x="{{ m.x }}" y="{{ m.y }}" width="{{ m.w }}" height="{{ m.h }}" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+<g transform="translate({{ m.icon_x }} {{ m.icon_y }}) scale(1.2)">
+  {{ m.icon|safe }}
+</g>
+<!-- <text x="{{ m.label_x }}" y="{{ m.label_y }}" font-size="10" font-weight="bold" fill="#607080">{{ m.label }}</text> -->
+<text x="{{ m.value_x }}" y="{{ m.value_y }}" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">{{ m.value }}</text>
+{%- endmacro %}

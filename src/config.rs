@@ -9,7 +9,6 @@ pub struct Config {
     pub forecast_source: Option<String>,
     pub preview_svg_path: Option<String>,
     pub preview_png_path: Option<String>,
-    pub color_test_mode: Option<bool>,
     pub weather: Option<WeatherConfig>,
     pub mock: Option<MockConfig>,
 }

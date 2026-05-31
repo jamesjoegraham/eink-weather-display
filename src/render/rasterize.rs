@@ -1,3 +1,6 @@
+// src/svg/render.rs
+// SVG rendering logic extracted from svg_render.rs
+
 use std::{error::Error, path::Path};
 
 #[cfg(target_os = "linux")]
@@ -8,7 +11,7 @@ fn svg_options_with_fonts() -> usvg::Options<'static> {
     options.font_family = "Roboto".to_owned();
     let fontdb = options.fontdb_mut();
     fontdb.load_system_fonts();
-    fontdb.load_font_data(include_bytes!("../fonts/Roboto-Regular.ttf").to_vec());
+    fontdb.load_font_data(include_bytes!("../../fonts/Roboto-Regular.ttf").to_vec());
     fontdb.set_serif_family("Roboto");
     fontdb.set_sans_serif_family("Roboto");
     fontdb.set_cursive_family("Roboto");
@@ -123,8 +126,6 @@ fn map_rgb_to_oct_color(r: u8, g: u8, b: u8, x: u32, y: u32) -> OctColor {
         (OctColor::Orange, (255u8, 128u8, 0u8)),
     ];
 
-    // Blue pigment on this panel is visually dark; for blue-dominant tones,
-    // dither between blue and white to keep icons/readouts legible.
     if b > r.saturating_add(24) && b > g.saturating_add(16) {
         let whiteness = ((u16::from(r) + u16::from(g)) / 2) as u8;
         let threshold = bayer4(x, y).saturating_mul(16);
@@ -135,8 +136,6 @@ fn map_rgb_to_oct_color(r: u8, g: u8, b: u8, x: u32, y: u32) -> OctColor {
         };
     }
 
-    // Low-saturation tones (including gray) look better with explicit luma dithering.
-    // This preserves visible mid-tones instead of collapsing most grays to flat white.
     let max_c = r.max(g).max(b);
     let min_c = r.min(g).min(b);
     let saturation = max_c.saturating_sub(min_c);
@@ -180,7 +179,6 @@ fn map_rgb_to_oct_color(r: u8, g: u8, b: u8, x: u32, y: u32) -> OctColor {
         return best_color;
     }
 
-    // Ordered palette dithering between two nearest colors: more detail and softer gradients.
     let best_weight = (second_dist as f32) / ((best_dist + second_dist) as f32);
     let threshold = (bayer4(x, y) as f32) / 15.0;
     if best_weight >= threshold {

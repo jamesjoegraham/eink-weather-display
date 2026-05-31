@@ -49,16 +49,10 @@ impl DayPhase {
             DayPhase::Night
         }
     }
-
-    pub fn is_day(&self) -> bool {
-        matches!(self, DayPhase::Day)
-    }
-    pub fn is_night(&self) -> bool {
-        matches!(self, DayPhase::Night)
-    }
 }
 
-pub enum Icon {
+#[derive(Debug, Clone)]
+pub enum WeatherIcon {
     UVIndex,
     Rain,
     Wind,
@@ -67,15 +61,15 @@ pub enum Icon {
     Visibility,
 }
 
-impl Icon {
+impl WeatherIcon {
     pub fn filename(&self) -> &'static str {
         match self {
-            Icon::UVIndex => "uv-index.svg",
-            Icon::Rain => "rain-icon.svg",
-            Icon::Humidity => "raindrop.svg",
-            Icon::Wind => "wind.svg",
-            Icon::Pressure => "pressure.svg",
-            Icon::Visibility => "visibility.svg",
+            WeatherIcon::UVIndex => "uv-index.svg",
+            WeatherIcon::Rain => "raindrops.svg",
+            WeatherIcon::Humidity => "raindrop.svg",
+            WeatherIcon::Wind => "wind.svg",
+            WeatherIcon::Pressure => "pressure.svg",
+            WeatherIcon::Visibility => "visibility.svg",
         }
     }
 }

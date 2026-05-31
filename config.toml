@@ -1,9 +1,9 @@
 # Example config.toml for eink-weather
 refresh_secs = 600
 theme = "light"
-forecast_source = "mock"
-preview_svg_path = "output.svg"
-preview_png_path = "output.png"
+forecast_source = "live"
+preview_svg_path = "./tmp/preview.svg"
+preview_png_path = "./tmp/preview.png"
 color_test_mode = false
 
 [weather]

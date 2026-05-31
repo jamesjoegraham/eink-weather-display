@@ -1,0 +1,12 @@
+{% macro icon(x, y, width, height, inner, viewBox='0 0 128 128') -%}
+<svg
+  x="{{ x }}"
+  y="{{ y }}"
+  width="{{ width }}"
+  height="{{ height }}"
+  viewBox="{{ viewBox }}"
+  preserveAspectRatio="xMidYMid meet"
+>
+  {{ inner | safe }}
+</svg>
+{%- endmacro %}
