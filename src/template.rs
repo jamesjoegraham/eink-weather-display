@@ -137,7 +137,7 @@ pub fn render_dashboard_svg(
                 } else {
                     hour
                 };
-                format!("{}:00 {}", hour_12, am_pm)
+                format!("{}{}", hour_12, am_pm)
             }).unwrap_or_else(|| h.hour_label.clone());
             context! {
                 time => hour_label,

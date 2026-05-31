@@ -49,7 +49,7 @@
 
   <g id="hourly-forecast-group">
 
-    <text x="12" y="270" font-size="18" font-weight="bold" fill="#000000">NEXT 12 HOURS</text>
+    <text x="12" y="270" font-size="18" font-weight="bold" fill="#2f2f2f">NEXT 12 HOURS</text>
 
     {% set start_x = 12 %}
     {% set card_w = 122 %}
@@ -90,28 +90,28 @@
     <g transform="translate({{ left_text_x - 17 }} {{ top_row_icon_y }})">
       {{ h.rain_badge_icon|safe }}
     </g>
-    <text x="{{ left_text_x }}" y="{{ top_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.rain }}</text>
+    <text x="{{ left_text_x }}" y="{{ top_row_text_y }}" font-size="14" text-anchor="start" fill="#000000">{{ h.rain }}</text>
 
     <!-- Wind speed (top-right) -->
     <g transform="translate({{ right_text_x - 17 }} {{ top_row_icon_y }})">
       {{ h.wind_badge_icon|safe }}
     </g>
-    <text x="{{ right_text_x }}" y="{{ top_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.wind }}</text>
+    <text x="{{ right_text_x }}" y="{{ top_row_text_y }}" font-size="14" text-anchor="start" fill="#000000">{{ h.wind }}</text>
 
     <!-- UV index (bottom-left) -->
     <g transform="translate({{ left_text_x - 17 }} {{ bottom_row_icon_y }})">
       {{ h.uv_badge_icon|safe }}
     </g>
-    <text x="{{ left_text_x }}" y="{{ bottom_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.uv }}</text>
+    <text x="{{ left_text_x }}" y="{{ bottom_row_text_y }}" font-size="14" text-anchor="start" fill="#000000">{{ h.uv }}</text>
 
     <!-- Humidity (bottom-right) -->
     <g transform="translate({{ right_text_x - 17 }} {{ bottom_row_icon_y }})">
       {{ h.humidity_badge_icon|safe }}
     </g>
-    <text x="{{ right_text_x }}" y="{{ bottom_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.humidity }}</text>
+    <text x="{{ right_text_x }}" y="{{ bottom_row_text_y }}" font-size="14" text-anchor="start" fill="#000000">{{ h.humidity }}</text>
 
     <!-- Time -->
-    <text x="{{ card_mid_x }}" y="458" font-size="14" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.time }}</text>
+    <text x="{{ card_mid_x }}" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.time }}</text>
     {% endfor %}
   </g>
 </svg>

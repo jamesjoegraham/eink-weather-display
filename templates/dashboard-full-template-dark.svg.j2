@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
   {% macro metric_card(m) -%}
-  <rect x="{{ m.x }}" y="{{ m.y }}" width="{{ m.w }}" height="{{ m.h }}" rx="8" fill="#181a1b" stroke="#444" stroke-width="1"/>
+  <rect x="{{ m.x }}" y="{{ m.y }}" width="{{ m.w }}" height="{{ m.h }}" rx="8" fill="#000000" stroke="#444" stroke-width="1"/>
   <g transform="translate({{ m.icon_x }} {{ m.icon_y }}) scale(1.2)">
     {{ m.icon|safe }}
   </g>
@@ -11,7 +11,7 @@
     text { font-family: 'Roboto'; }
   </style>
   <g id="background-layer">
-    <rect width="800" height="480" fill="#181a1b"/>
+    <rect width="800" height="480" fill="#000000"/>
   </g>
 
   <g id="status-bar-group">
