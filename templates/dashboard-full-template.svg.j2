@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  {% macro metric_card(m) -%}
+  <rect x="{{ m.x }}" y="{{ m.y }}" width="{{ m.w }}" height="{{ m.h }}" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate({{ m.icon_x }} {{ m.icon_y }}) scale(1.2)">
+    {{ m.icon|safe }}
+  </g>
+  <!-- <text x="{{ m.label_x }}" y="{{ m.label_y }}" font-size="10" font-weight="bold" fill="#607080">{{ m.label }}</text> -->
+  <text x="{{ m.value_x }}" y="{{ m.value_y }}" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">{{ m.value }}</text>
+  {%- endmacro %}
+
+  <style>
+    text { font-family: 'Roboto'; }
+  </style>
+  <g id="background-layer">
+    <rect width="800" height="480" fill="#ffffff"/>
+  </g>
+
+  <g id="status-bar-group">
+    <rect x="0" y="0" width="160" height="12" fill="#ff8000"/>
+    <rect x="160" y="0" width="160" height="12" fill="#ffff00"/>
+    <rect x="320" y="0" width="144" height="12" fill="#ff0000"/>
+    <rect x="464" y="0" width="144" height="12" fill="#0000ff"/>
+    <rect x="608" y="0" width="192" height="12" fill="#008000"/>
+  </g>
+
+  <g id="header-group">
+    <text x="776" y="65" font-size="48" font-weight="bold" text-anchor="end" fill="#000000">{{ now_time }}</text>
+    <text x="776" y="90" font-size="18" font-weight="bold" text-anchor="end" fill="#008000">{{ date }}</text>
+  </g>
+
+  <g id="current-conditions-group">
+    <rect x="12" y="108" width="776" height="125" rx="12" fill="#ffffff"/>
+
+    <g id="current-summary-group">
+      <g transform="translate(-225 -175) scale(1.8)">
+        {{ current_icon|safe }}
+      </g>
+      <text x="240" y="80" font-size="22" font-weight="bold" fill="#0066cc">CONDITION</text>
+      <text x="240" y="110" font-size="30" font-weight="bold" fill="#000000">{{ current_cond }}</text>
+      <text x="250" y="183" font-size="78" font-weight="bold" fill="#000000">{{ current_temp }}</text>
+    </g>
+
+    <g id="metrics-panel-group">
+      {% for m in metrics %}
+      {{ metric_card(m) }}
+      {% endfor %}
+    </g>
+  </g>
+
+  <g id="hourly-forecast-group">
+
+    <text x="12" y="270" font-size="18" font-weight="bold" fill="#000000">NEXT 12 HOURS</text>
+
+    {% set start_x = 12 %}
+    {% set card_w = 122 %}
+    {% set gap = 8 %}
+    {% set bar_top = 350 %}
+    {% set bar_bottom = 395 %}
+    {% for c in connectors %}
+      {% set i = c.index %}
+      {% set x = start_x + (i + 1) * (card_w + gap) %}
+      {% set y1 = bar_top %}
+      {% set y2 = bar_bottom %}
+      {% if c.kind == 'sunrise' %}
+        <rect x="{{ x - 8 }}" y="{{ y1 }}" width="12" height="{{ y2 - y1 }}" rx="4" fill="#ffa500" opacity="1"/>
+      {% elif c.kind == 'dusk' %}
+        <rect x="{{ x - 8 }}" y="{{ y1 }}" width="12" height="{{ y2 - y1 }}" rx="4" fill="#0000ff" opacity="1"/>
+      {% endif %}
+    {% endfor %}
+
+    {% for h in hours %}
+    {% set card_x = start_x + loop.index0 * (card_w + gap) %}
+    {% set card_mid_x = card_x + (card_w / 2) %}
+    {% set left_text_x = card_mid_x - 30 %}
+    {% set right_text_x = card_mid_x + 16 %}
+    {% set top_row_icon_y = 400 %}
+    {% set top_row_text_y = 413 %}
+    {% set bottom_row_icon_y = 420 %}
+    {% set bottom_row_text_y = 433 %}
+    <rect x="{{ card_x }}" y="284" width="{{ card_w }}" height="184" rx="10" fill="#ffffff" stroke="#888888" stroke-width="2"/>
+
+    <g transform="translate({{ card_x + 29 }} 294)">
+      {{ h.icon|safe }}
+    </g>
+
+    <!-- Temperature -->
+    <text x="{{ card_mid_x }}" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.temp }}</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate({{ left_text_x - 17 }} {{ top_row_icon_y }})">
+      {{ h.rain_badge_icon|safe }}
+    </g>
+    <text x="{{ left_text_x }}" y="{{ top_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.rain }}</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate({{ right_text_x - 17 }} {{ top_row_icon_y }})">
+      {{ h.wind_badge_icon|safe }}
+    </g>
+    <text x="{{ right_text_x }}" y="{{ top_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.wind }}</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate({{ left_text_x - 17 }} {{ bottom_row_icon_y }})">
+      {{ h.uv_badge_icon|safe }}
+    </g>
+    <text x="{{ left_text_x }}" y="{{ bottom_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.uv }}</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate({{ right_text_x - 17 }} {{ bottom_row_icon_y }})">
+      {{ h.humidity_badge_icon|safe }}
+    </g>
+    <text x="{{ right_text_x }}" y="{{ bottom_row_text_y }}" font-size="12" text-anchor="start" fill="#0066cc">{{ h.humidity }}</text>
+
+    <!-- Time -->
+    <text x="{{ card_mid_x }}" y="458" font-size="14" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.time }}</text>
+    {% endfor %}
+  </g>
+</svg>

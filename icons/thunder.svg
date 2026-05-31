@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 440">
+  <rect width="384" height="440" fill="none"/>
+
+  <!-- Cloud shape reused from the cloudy icon source geometry -->
+  <path
+     d="M280,125.672c-4.32,0-8.632,0.264-12.896,0.784C253.592,85.328,213.64,56,168,56c-57.344,0-104,45.376-104,101.16
+       c0,0.904,0.008,1.8,0.032,2.696C26.592,169.992,0,203.064,0,242.328C0,289.568,39.48,328,88,328h192
+       c57.344,0,104-45.376,104-101.16S337.344,125.672,280,125.672z"
+    fill="#bdbdbd"
+    stroke="none"
+    stroke-width="3"
+    transform="translate(22,10) scale(0.88)"
+  />
+
+  <!-- Subtle rain streaks to keep the icon clean and elegant -->
+  <g stroke="#0066ff" stroke-width="10" stroke-linecap="round" opacity="0.95">
+    <line x1="125" y1="302" x2="125" y2="340"/>
+    <line x1="265" y1="302" x2="265" y2="360"/>
+  </g>
+
+  <!-- Lightning bolt centered under the cloud with visual clearance -->
+  <polygon
+    points="206,250 156,330 196,330 166,414 252,304 210,304"
+    fill="#FFFF00"
+    stroke="none"
+    stroke-width="8"
+    stroke-linejoin="round"
+  />
+</svg>
