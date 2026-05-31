@@ -1,0 +1,18 @@
+# Example config.toml for eink-weather
+refresh_secs = 600
+theme = "light"
+forecast_source = "mock"
+preview_svg_path = "output.svg"
+preview_png_path = "output.png"
+color_test_mode = false
+
+[weather]
+lat = 44.655215
+lon = -63.590768
+tz = "America/Halifax"
+hours = 12
+
+[mock]
+preset = "thunder"
+night = false
+hours = 12

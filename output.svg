@@ -1,0 +1,674 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  
+
+  <style>
+    text { font-family: 'Roboto'; }
+  </style>
+  <g id="background-layer">
+    <rect width="800" height="480" fill="#ffffff"/>
+  </g>
+
+  <g id="daynight-bar-group">
+    <rect x="0" y="0" width="800" height="6" fill="#e0e0e0"/>
+    <rect x="0" y="0" width="544" height="6" fill="#ff8000"/>
+  </g>
+
+  <g id="header-group">
+    <text x="776" y="65" font-size="48" font-weight="bold" text-anchor="end" fill="#000000">4:02 PM</text>
+    <text x="776" y="90" font-size="18" font-weight="bold" text-anchor="end" fill="#008000">Sun, May 31</text>
+  </g>
+
+  <g id="current-conditions-group">
+    <rect x="12" y="108" width="776" height="125" rx="12" fill="#ffffff"/>
+
+    <g id="current-summary-group">
+      <g transform="translate(-225 -175) scale(1.8)">
+        <svg x="142" y="114" width="108" height="108" viewBox="0 0 384 440" preserveAspectRatio="xMidYMid meet"><rect width="384" height="440" fill="none"/>
+
+  <!-- Cloud shape reused from the cloudy icon source geometry -->
+  <path
+     d="M280,125.672c-4.32,0-8.632,0.264-12.896,0.784C253.592,85.328,213.64,56,168,56c-57.344,0-104,45.376-104,101.16
+       c0,0.904,0.008,1.8,0.032,2.696C26.592,169.992,0,203.064,0,242.328C0,289.568,39.48,328,88,328h192
+       c57.344,0,104-45.376,104-101.16S337.344,125.672,280,125.672z"
+    fill="#bdbdbd"
+    stroke="none"
+    stroke-width="3"
+    transform="translate(22,10) scale(0.88)"
+  />
+
+  <!-- Subtle rain streaks to keep the icon clean and elegant -->
+  <g stroke="#0066ff" stroke-width="10" stroke-linecap="round" opacity="0.95">
+    <line x1="125" y1="302" x2="125" y2="340"/>
+    <line x1="265" y1="302" x2="265" y2="360"/>
+  </g>
+
+  <!-- Lightning bolt centered under the cloud with visual clearance -->
+  <polygon
+    points="206,250 156,330 196,330 166,414 252,304 210,304"
+    fill="#FFFF00"
+    stroke="none"
+    stroke-width="8"
+    stroke-linejoin="round"
+  /></svg>
+      </g>
+      <text x="240" y="80" font-size="22" font-weight="bold" fill="#111111">CONDITION</text>
+      <text x="240" y="110" font-size="30" font-weight="bold" fill="#000000">Thunderstorm</text>
+      <text x="250" y="183" font-size="78" font-weight="bold" fill="#111111">14°C</text>
+    </g>
+
+    <g id="metrics-panel-group">
+      
+      <rect x="445" y="100" width="165" height="50" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate(457 112) scale(1.2)">
+    <svg x="0" y="0" width="22" height="22" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+  </g>
+  <!-- <text x="" y="" font-size="10" font-weight="bold" fill="#607080"></text> -->
+  <text x="598" y="130" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">99%</text>
+      
+      <rect x="618" y="100" width="165" height="50" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate(630 112) scale(1.2)">
+    <svg x="0" y="0" width="22" height="22" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+  </g>
+  <!-- <text x="" y="" font-size="10" font-weight="bold" fill="#607080"></text> -->
+  <text x="771" y="130" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">7 km h⁻¹</text>
+      
+      <rect x="445" y="154" width="165" height="50" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate(457 166) scale(1.2)">
+    <svg x="0" y="0" width="22" height="22" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+  </g>
+  <!-- <text x="" y="" font-size="10" font-weight="bold" fill="#607080"></text> -->
+  <text x="598" y="184" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">1</text>
+      
+      <rect x="618" y="154" width="165" height="50" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate(630 166) scale(1.2)">
+    <svg x="0" y="0" width="22" height="22" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path d="M12 9C11.4477 9 11 9.44771 11 10V15.2676C10.4022 15.6134 10 16.2597 10 17C10 18.1046 10.8954 19 12 19C13.1046 19 14 18.1046 14 17C14 16.2597 13.5978 15.6134 13 15.2676V10C13 9.44771 12.5523 9 12 9Z" fill="#0F0F0F"/>
+<path d="M11 6C11 5.44772 11.4477 5 12 5C12.5523 5 13 5.44772 13 6C13 6.55228 12.5523 7 12 7C11.4477 7 11 6.55228 11 6Z" fill="#0F0F0F"/>
+<path d="M16 7C15.4477 7 15 7.44772 15 8C15 8.55229 15.4477 9 16 9C16.5523 9 17 8.55229 17 8C17 7.44772 16.5523 7 16 7Z" fill="#0F0F0F"/>
+<path d="M6 13C5.44772 13 5 12.5523 5 12C5 11.4477 5.44772 11 6 11C6.55228 11 7 11.4477 7 12C7 12.5523 6.55228 13 6 13Z" fill="#0F0F0F"/>
+<path d="M7 8C7 8.55229 7.44772 9 8 9C8.55228 9 9 8.55228 9 8C9 7.44772 8.55228 7 8 7C7.44772 7 7 7.44772 7 8Z" fill="#0F0F0F"/>
+<path d="M18 13C17.4477 13 17 12.5523 17 12C17 11.4477 17.4477 11 18 11C18.5523 11 19 11.4477 19 12C19 12.5523 18.5523 13 18 13Z" fill="#0F0F0F"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23ZM12 20.9932C7.03321 20.9932 3.00683 16.9668 3.00683 12C3.00683 7.03321 7.03321 3.00683 12 3.00683C16.9668 3.00683 20.9932 7.03321 20.9932 12C20.9932 16.9668 16.9668 20.9932 12 20.9932Z" fill="#0F0F0F"/></svg>
+  </g>
+  <!-- <text x="" y="" font-size="10" font-weight="bold" fill="#607080"></text> -->
+  <text x="771" y="184" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">998 hPa</text>
+      
+      <rect x="445" y="208" width="165" height="50" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate(457 220) scale(1.2)">
+    <svg x="0" y="0" width="22" height="22" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+  </g>
+  <!-- <text x="" y="" font-size="10" font-weight="bold" fill="#607080"></text> -->
+  <text x="598" y="238" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">85%</text>
+      
+      <rect x="618" y="208" width="165" height="50" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+  <g transform="translate(630 220) scale(1.2)">
+    <svg x="0" y="0" width="22" height="22" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+  </g>
+  <!-- <text x="" y="" font-size="10" font-weight="bold" fill="#607080"></text> -->
+  <text x="771" y="238" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">3 km</text>
+      
+    </g>
+  </g>
+
+  <g id="hourly-forecast-group">
+
+    <text x="12" y="270" font-size="18" font-weight="bold" fill="#000000">NEXT 12 HOURS</text>
+
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <rect x="12" y="284" width="122" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
+
+    <g transform="translate(41 294)">
+      <svg x="0" y="0" width="64" height="64" viewBox="0 0 384 440" preserveAspectRatio="xMidYMid meet"><rect width="384" height="440" fill="none"/>
+
+  <!-- Cloud shape from cloudy.svg, simplified to a solid fill -->
+  <path
+    d="M280,125.672c-4.32,0-8.632,0.264-12.896,0.784C253.592,85.328,213.64,56,168,56c-57.344,0-104,45.376-104,101.16
+       c0,0.904,0.008,1.8,0.032,2.696C26.592,169.992,0,203.064,0,242.328C0,289.568,39.48,328,88,328h192
+       c57.344,0,104-45.376,104-101.16S337.344,125.672,280,125.672z"
+    fill="#bdbdbd"
+    transform="translate(22,10) scale(0.88)"
+  />
+
+  <!-- Heavier rain: balanced vertical streaks emerging from cloud base -->
+  <g stroke="#0066ff" stroke-width="10" stroke-linecap="round" opacity="0.95">
+    <line x1="146" y1="300" x2="146" y2="368"/>
+    <line x1="178" y1="300" x2="178" y2="382"/>
+    <line x1="210" y1="300" x2="210" y2="374"/>
+    <line x1="242" y1="300" x2="242" y2="388"/>
+  </g></svg>
+    </g>
+
+    <!-- Temperature -->
+    <text x="73.0" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">15°C</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate(26.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+    </g>
+    <text x="43.0" y="413" font-size="14" text-anchor="start" fill="#000000">93</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate(72.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+    </g>
+    <text x="89.0" y="413" font-size="14" text-anchor="start" fill="#000000">10</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate(26.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+    </g>
+    <text x="43.0" y="433" font-size="14" text-anchor="start" fill="#000000">2</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate(72.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+    </g>
+    <text x="89.0" y="433" font-size="14" text-anchor="start" fill="#000000">99</text>
+
+    <!-- Time -->
+    <text x="73.0" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">10am</text>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <rect x="142" y="284" width="122" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
+
+    <g transform="translate(171 294)">
+      <svg x="0" y="0" width="64" height="64" viewBox="0 0 384 440" preserveAspectRatio="xMidYMid meet"><rect width="384" height="440" fill="none"/>
+
+  <!-- Cloud shape from cloudy.svg, simplified to a solid fill -->
+  <path
+    d="M280,125.672c-4.32,0-8.632,0.264-12.896,0.784C253.592,85.328,213.64,56,168,56c-57.344,0-104,45.376-104,101.16
+       c0,0.904,0.008,1.8,0.032,2.696C26.592,169.992,0,203.064,0,242.328C0,289.568,39.48,328,88,328h192
+       c57.344,0,104-45.376,104-101.16S337.344,125.672,280,125.672z"
+    fill="#bdbdbd"
+    transform="translate(22,10) scale(0.88)"
+  />
+
+  <!-- Heavier rain: balanced vertical streaks emerging from cloud base -->
+  <g stroke="#0066ff" stroke-width="10" stroke-linecap="round" opacity="0.95">
+    <line x1="146" y1="300" x2="146" y2="368"/>
+    <line x1="178" y1="300" x2="178" y2="382"/>
+    <line x1="210" y1="300" x2="210" y2="374"/>
+    <line x1="242" y1="300" x2="242" y2="388"/>
+  </g></svg>
+    </g>
+
+    <!-- Temperature -->
+    <text x="203.0" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">16°C</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate(156.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+    </g>
+    <text x="173.0" y="413" font-size="14" text-anchor="start" fill="#000000">79</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate(202.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+    </g>
+    <text x="219.0" y="413" font-size="14" text-anchor="start" fill="#000000">11</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate(156.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+    </g>
+    <text x="173.0" y="433" font-size="14" text-anchor="start" fill="#000000">2</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate(202.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+    </g>
+    <text x="219.0" y="433" font-size="14" text-anchor="start" fill="#000000">99</text>
+
+    <!-- Time -->
+    <text x="203.0" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">11am</text>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <rect x="272" y="284" width="122" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
+
+    <g transform="translate(301 294)">
+      <svg x="0" y="0" width="64" height="64" viewBox="0 -4 32 32" preserveAspectRatio="xMidYMid meet"><title>cloud</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-519.000000, -781.000000)" fill="#bdbdbd">
+            <g transform="translate(535,793) scale(0.8) translate(-535,-793)">
+                <path d="M542.067,786.028 C540.599,783.053 537.543,781 534,781 C529.251,781 525.37,784.682 525.033,789.345 C521.542,790.34 519,793.39 519,797 C519,801.26 522.54,804.755 527,805 L542,805 C546.966,805 551,800.747 551,795.5 C551,790.444 547.049,786.323 542.067,786.028" id="cloud">
+                </path>
+            </g>
+        </g>
+    </g></svg>
+    </g>
+
+    <!-- Temperature -->
+    <text x="333.0" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">15°C</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate(286.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+    </g>
+    <text x="303.0" y="413" font-size="14" text-anchor="start" fill="#000000">95</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate(332.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+    </g>
+    <text x="349.0" y="413" font-size="14" text-anchor="start" fill="#000000">13</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate(286.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+    </g>
+    <text x="303.0" y="433" font-size="14" text-anchor="start" fill="#000000">4</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate(332.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+    </g>
+    <text x="349.0" y="433" font-size="14" text-anchor="start" fill="#000000">97</text>
+
+    <!-- Time -->
+    <text x="333.0" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">12pm</text>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <rect x="402" y="284" width="122" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
+
+    <g transform="translate(431 294)">
+      <svg x="0" y="0" width="64" height="64" viewBox="0 -4 32 32" preserveAspectRatio="xMidYMid meet"><title>cloud</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-519.000000, -781.000000)" fill="#bdbdbd">
+            <g transform="translate(535,793) scale(0.8) translate(-535,-793)">
+                <path d="M542.067,786.028 C540.599,783.053 537.543,781 534,781 C529.251,781 525.37,784.682 525.033,789.345 C521.542,790.34 519,793.39 519,797 C519,801.26 522.54,804.755 527,805 L542,805 C546.966,805 551,800.747 551,795.5 C551,790.444 547.049,786.323 542.067,786.028" id="cloud">
+                </path>
+            </g>
+        </g>
+    </g></svg>
+    </g>
+
+    <!-- Temperature -->
+    <text x="463.0" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">14°C</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate(416.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+    </g>
+    <text x="433.0" y="413" font-size="14" text-anchor="start" fill="#000000">81</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate(462.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+    </g>
+    <text x="479.0" y="413" font-size="14" text-anchor="start" fill="#000000">10</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate(416.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+    </g>
+    <text x="433.0" y="433" font-size="14" text-anchor="start" fill="#000000">3</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate(462.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+    </g>
+    <text x="479.0" y="433" font-size="14" text-anchor="start" fill="#000000">90</text>
+
+    <!-- Time -->
+    <text x="463.0" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">1pm</text>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <rect x="532" y="284" width="122" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
+
+    <g transform="translate(561 294)">
+      <svg x="0" y="0" width="64" height="64" viewBox="0 -4 32 32" preserveAspectRatio="xMidYMid meet"><title>cloud</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-519.000000, -781.000000)" fill="#bdbdbd">
+            <g transform="translate(535,793) scale(0.8) translate(-535,-793)">
+                <path d="M542.067,786.028 C540.599,783.053 537.543,781 534,781 C529.251,781 525.37,784.682 525.033,789.345 C521.542,790.34 519,793.39 519,797 C519,801.26 522.54,804.755 527,805 L542,805 C546.966,805 551,800.747 551,795.5 C551,790.444 547.049,786.323 542.067,786.028" id="cloud">
+                </path>
+            </g>
+        </g>
+    </g></svg>
+    </g>
+
+    <!-- Temperature -->
+    <text x="593.0" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">14°C</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate(546.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+    </g>
+    <text x="563.0" y="413" font-size="14" text-anchor="start" fill="#000000">91</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate(592.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+    </g>
+    <text x="609.0" y="413" font-size="14" text-anchor="start" fill="#000000">8</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate(546.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+    </g>
+    <text x="563.0" y="433" font-size="14" text-anchor="start" fill="#000000">2</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate(592.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+    </g>
+    <text x="609.0" y="433" font-size="14" text-anchor="start" fill="#000000">95</text>
+
+    <!-- Time -->
+    <text x="593.0" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">2pm</text>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <rect x="662" y="284" width="122" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
+
+    <g transform="translate(691 294)">
+      <svg x="0" y="0" width="64" height="64" viewBox="0 -4 32 32" preserveAspectRatio="xMidYMid meet"><title>cloud</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-519.000000, -781.000000)" fill="#bdbdbd">
+            <g transform="translate(535,793) scale(0.8) translate(-535,-793)">
+                <path d="M542.067,786.028 C540.599,783.053 537.543,781 534,781 C529.251,781 525.37,784.682 525.033,789.345 C521.542,790.34 519,793.39 519,797 C519,801.26 522.54,804.755 527,805 L542,805 C546.966,805 551,800.747 551,795.5 C551,790.444 547.049,786.323 542.067,786.028" id="cloud">
+                </path>
+            </g>
+        </g>
+    </g></svg>
+    </g>
+
+    <!-- Temperature -->
+    <text x="723.0" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">13°C</text>
+
+    <!-- Rain probability (top-left) -->
+    <g transform="translate(676.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><title>rain</title>
+    <desc>Created with Sketch Beta.</desc>
+    <defs>
+
+</defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icon-Set-Filled" transform="translate(-570.000000, -777.000000)" fill="#bdbdbd">
+            <path d="M593.067,782.029 C591.599,779.053 588.543,777 585,777 C580.251,777 576.37,780.682 576.033,785.345 C572.542,786.341 570,789.39 570,793 C570,797.26 573.54,800.755 578,801 L592,801 C597.785,801 602,796.747 602,791.5 C602,786.445 598.049,782.324 593.067,782.029 L593.067,782.029 Z" id="rain-cloud">
+
+</path>
+            <path d="M593,803 C592.447,803 592,803.448 592,804 C592,804.553 592.447,805 593,805 C593.553,805 594,804.553 594,804 C594,803.448 593.553,803 593,803 L593,803 Z M589,807 C588.447,807 588,807.448 588,808 C588,808.553 588.447,809 589,809 C589.553,809 590,808.553 590,808 C590,807.448 589.553,807 589,807 L589,807 Z M587,803 C586.447,803 586,803.448 586,804 C586,804.553 586.447,805 587,805 C587.553,805 588,804.553 588,804 C588,803.448 587.553,803 587,803 L587,803 Z M581,803 C580.447,803 580,803.448 580,804 C580,804.553 580.447,805 581,805 C581.553,805 582,804.553 582,804 C582,803.448 581.553,803 581,803 L581,803 Z M583,807 C582.447,807 582,807.448 582,808 C582,808.553 582.447,809 583,809 C583.553,809 584,808.553 584,808 C584,807.448 583.553,807 583,807 L583,807 Z" id="rain-drops" fill="#0000FF">
+
+</path>
+        </g>
+    </g></svg>
+    </g>
+    <text x="693.0" y="413" font-size="14" text-anchor="start" fill="#000000">77</text>
+
+    <!-- Wind speed (top-right) -->
+    <g transform="translate(722.0 400)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet"><path d="M13 1H11V3H13C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5H2V7H13C14.6569 7 16 5.65685 16 4C16 2.34315 14.6569 1 13 1Z" fill="#7e7e7e"/>
+<path d="M0 11H11C11.5523 11 12 11.4477 12 12C12 12.5523 11.5523 13 11 13H9V15H11C12.6569 15 14 13.6569 14 12C14 10.3431 12.6569 9 11 9H0V11Z" fill="#7e7e7e"/></svg>
+    </g>
+    <text x="739.0" y="413" font-size="14" text-anchor="start" fill="#000000">12</text>
+
+    <!-- UV index (bottom-left) -->
+    <g transform="translate(676.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet"><defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <title>uv-index--filled</title>
+  <path fill="#FFA500" d="M16,30l-3.4634-5.8223L6,26l1.8223-6.5369L2,16l5.8223-3.4631L6,6l6.5366,1.8223L16,2l3.4634,5.8223L26,6l-1.8223,6.5369L30,16l-5.8223,3.4631L26,26l-6.5366-1.8223Z"/>
+  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/></svg>
+    </g>
+    <text x="693.0" y="433" font-size="14" text-anchor="start" fill="#000000">2</text>
+
+    <!-- Humidity (bottom-right) -->
+    <g transform="translate(722.0 420)">
+      <svg x="0" y="0" width="14" height="14" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet"><g>
+	<g>
+		<path fill="#0000ff" d="M414.21,226.014L256,0L97.791,226.014c-65.493,93.56-29.274,224.629,75.837,269.286C198.933,506.053,226.772,512,256,512
+			s57.067-5.947,82.373-16.699C443.484,450.643,479.701,319.574,414.21,226.014z"/>
+	</g>
+</g></svg>
+    </g>
+    <text x="739.0" y="433" font-size="14" text-anchor="start" fill="#000000">88</text>
+
+    <!-- Time -->
+    <text x="723.0" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">3pm</text>
+    
+  </g>
+</svg>

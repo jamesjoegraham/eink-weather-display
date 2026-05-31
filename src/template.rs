@@ -144,8 +144,8 @@ pub fn render_dashboard_svg(
                 cond => h.condition.summary(),
                 temp => format!("{:.0}°C", h.temperature_c),
                 wind => format!("{:.0}", h.wind_speed_kmh),
-                rain => format!("{}%", h.precipitation_probability),
-                humidity => format!("{}%", h.humidity_percent),
+                rain => format!("{}", h.precipitation_probability),
+                humidity => format!("{}", h.humidity_percent),
                 uv => format!("{:.0}", h.uv_index),
                 icon => icon_markup(h.condition.icon(&h.day_phase), 0, 0, 64, 64),
                 wind_badge_icon => icon_markup(Icon::Wind.filename(), 0, 0, 14, 14),
@@ -242,6 +242,46 @@ pub fn render_dashboard_svg(
         })
         .collect();
 
+    // --- Day/Night Progress Bar Calculation ---
+    use chrono::{NaiveTime};
+    let (bar_color, bar_width) = if let (Some(sr), Some(ss)) = (forecast.sunrise.as_ref(), forecast.sunset.as_ref()) {
+        let parse_time = |s: &str| {
+            if let Some(t) = s.split('T').nth(1) {
+                NaiveTime::parse_from_str(t, "%H:%M")
+                    .or_else(|_| NaiveTime::parse_from_str(t, "%H:%M:%S")).ok()
+            } else { None }
+        };
+        let sunrise = parse_time(sr);
+        let sunset = parse_time(ss);
+        let now_time = now.time();
+        if let (Some(sunrise), Some(sunset)) = (sunrise, sunset) {
+            if now_time >= sunrise && now_time < sunset {
+                // Daytime
+                let total = (sunset - sunrise).num_seconds().max(1) as f32;
+                let elapsed = (now_time - sunrise).num_seconds().max(0) as f32;
+                let percent = (elapsed / total).clamp(0.0, 1.0);
+                ("#ff8000", (800.0 * percent).round() as i32)
+            } else {
+                // Nighttime
+                let (night_start, night_end) = if now_time < sunrise {
+                    // After midnight, before sunrise
+                    (sunset, sunrise)
+                } else {
+                    // After sunset, before midnight
+                    (sunset, sunrise + chrono::Duration::days(1))
+                };
+                let total = (night_end - night_start).num_seconds().max(1) as f32;
+                let elapsed = (now_time - night_start).num_seconds().rem_euclid(total as i64) as f32;
+                let percent = (elapsed / total).clamp(0.0, 1.0);
+                ("#0000ff", (800.0 * percent).round() as i32)
+            }
+        } else {
+            ("#cccccc", 0)
+        }
+    } else {
+        ("#cccccc", 0)
+    };
+
     let rendered = template.render(context! {
         date => header_date,
         now_time => now.format("%-I:%M %p").to_string(),
@@ -258,6 +298,8 @@ pub fn render_dashboard_svg(
         metrics => metrics,
         hours => hours,
         connectors => connectors,
+        daynight_bar_color => bar_color,
+        daynight_bar_width => bar_width,
     })?;
 
     Ok(rendered.into_bytes())

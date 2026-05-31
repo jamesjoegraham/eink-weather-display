@@ -1,6 +1,24 @@
+use std::str::FromStr;
+impl std::str::FromStr for ForecastSource {
+	type Err = ();
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s.to_ascii_lowercase().as_str() {
+			"demo" => Ok(ForecastSource::Demo),
+			"mock" => Ok(ForecastSource::Mock),
+			_ => Ok(ForecastSource::Live),
+		}
+	}
+}
+
+impl Default for ForecastSource {
+	fn default() -> Self {
+		ForecastSource::Live
+	}
+}
 use reqwest::blocking::Client;
 use serde::Deserialize;
-use std::{env, error::Error, time::Duration};
+use std::{error::Error, time::Duration};
+use crate::config::{Config, WeatherConfig, MockConfig};
 use crate::display::{DayPhase, WeatherCondition};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -9,6 +27,7 @@ pub enum ForecastSource {
 	Demo,
 	Mock,
 }
+
 
 #[derive(Clone, Copy, Debug)]
 pub struct MockPreset {
@@ -113,19 +132,26 @@ pub struct ForecastStrip {
 	pub sunset: Option<String>,
 }
 
-pub fn forecast_source_from_env() -> ForecastSource {
-	match env::var("EINK_WEATHER_FORECAST_SOURCE") {
-		Ok(value) if value.eq_ignore_ascii_case("demo") => ForecastSource::Demo,
-		Ok(value) if value.eq_ignore_ascii_case("mock") => ForecastSource::Mock,
-		_ => ForecastSource::Live,
-	}
-}
 
-pub fn load_forecast_by_source(source: ForecastSource) -> Result<ForecastStrip, Box<dyn Error>> {
+// No longer needed: forecast_source_from_env
+
+pub fn load_forecast_by_source(source: ForecastSource, config: &Config) -> Result<ForecastStrip, Box<dyn Error>> {
 	match source {
-		ForecastSource::Live => load_forecast_from_env(),
+		ForecastSource::Live => {
+			if let Some(ref weather_cfg) = config.weather {
+				load_forecast_from_config(weather_cfg)
+			} else {
+				Err("Missing weather config section".into())
+			}
+		},
 		ForecastSource::Demo => Ok(demo_forecast()),
-		ForecastSource::Mock => load_mock_forecast_from_env(),
+		ForecastSource::Mock => {
+			if let Some(ref mock_cfg) = config.mock {
+				load_mock_forecast_from_config(mock_cfg)
+			} else {
+				Err("Missing mock config section".into())
+			}
+		},
 	}
 }
 
@@ -174,22 +200,12 @@ struct OpenMeteoHourly {
 	weather_code: Vec<u16>,
 }
 
-pub fn load_forecast_from_env() -> Result<ForecastStrip, Box<dyn Error>> {
-	let latitude = env::var("EINK_WEATHER_LAT")
-		.ok()
-		.and_then(|value| value.parse::<f32>().ok())
-		.unwrap_or(44.655215);
-
-	let longitude = env::var("EINK_WEATHER_LON")
-		.ok()
-		.and_then(|value| value.parse::<f32>().ok())
-		.unwrap_or(-63.590768);
-
-	let timezone = env::var("EINK_WEATHER_TZ").unwrap_or_else(|_| "auto".to_owned());
-
-	let hours = forecast_entry_count_from_env();
-
-	fetch_open_meteo_forecast(latitude, longitude, &timezone, hours)
+pub fn load_forecast_from_config(cfg: &WeatherConfig) -> Result<ForecastStrip, Box<dyn Error>> {
+	let latitude = cfg.lat.unwrap_or(44.655215);
+	let longitude = cfg.lon.unwrap_or(-63.590768);
+	let timezone = cfg.tz.clone().unwrap_or_else(|| "auto".to_owned());
+	let hours = cfg.hours.unwrap_or(12);
+	fetch_open_meteo_forecast(latitude as f32, longitude as f32, &timezone, hours)
 }
 
 pub fn fetch_open_meteo_forecast(
@@ -320,38 +336,17 @@ pub fn demo_forecast() -> ForecastStrip {
 	}
 }
 
-pub fn load_mock_forecast_from_env() -> Result<ForecastStrip, Box<dyn Error>> {
-	let preset_name = env::var("EINK_WEATHER_MOCK_PRESET").unwrap_or_else(|_| "thunder".to_owned());
-	let mut preset = lookup_mock_preset(&preset_name).ok_or_else(|| {
+pub fn load_mock_forecast_from_config(cfg: &MockConfig) -> Result<ForecastStrip, Box<dyn Error>> {
+	let preset_name = cfg.preset.clone().unwrap_or_else(|| "thunder".to_owned());
+	let preset = lookup_mock_preset(&preset_name).ok_or_else(|| {
 		let names = mock_preset_names().join(", ");
 		format!(
-			"unknown EINK_WEATHER_MOCK_PRESET='{preset_name}'. Supported values: {names}"
+			"unknown mock preset='{preset_name}'. Supported values: {names}"
 		)
 	})?;
 
-	if let Ok(code) = env::var("EINK_WEATHER_MOCK_WEATHER_CODE") {
-		if let Ok(parsed_code) = code.parse::<u16>() {
-			preset.weather_code = parsed_code;
-		}
-	}
-
-	if let Ok(precip) = env::var("EINK_WEATHER_MOCK_PRECIP") {
-		if let Ok(parsed_precip) = precip.parse::<u8>() {
-			preset.precipitation_probability = parsed_precip.min(100);
-		}
-	}
-
-	if let Ok(temp) = env::var("EINK_WEATHER_MOCK_TEMP_C") {
-		if let Ok(parsed_temp) = temp.parse::<f32>() {
-			preset.base_temp_c = parsed_temp;
-		}
-	}
-
-	let hours = forecast_entry_count_from_env();
-
-	let is_night = env::var("EINK_WEATHER_MOCK_NIGHT")
-		.map(|value| value.eq_ignore_ascii_case("true") || value == "1")
-		.unwrap_or(false);
+	let hours = cfg.hours.unwrap_or(12);
+	let is_night = cfg.night.unwrap_or(false);
 
 	let start_hour = if is_night { 21 } else { 9 };
 	let mut entries = Vec::with_capacity(hours);
@@ -386,6 +381,11 @@ pub fn load_mock_forecast_from_env() -> Result<ForecastStrip, Box<dyn Error>> {
 		});
 	}
 
+	use chrono::Local;
+	let today = Local::now().format("%Y-%m-%d");
+	let sunrise = Some(format!("{}T05:30", today));
+	let sunset = Some(format!("{}T21:00", today));
+
 	Ok(ForecastStrip {
 		latitude: 44.6488,
 		longitude: -63.5752,
@@ -395,19 +395,12 @@ pub fn load_mock_forecast_from_env() -> Result<ForecastStrip, Box<dyn Error>> {
 			"mock/day".to_owned()
 		},
 		hours: entries,
-		sunrise: None,
-		sunset: None,
+		sunrise,
+		sunset,
 	})
 }
 
-fn forecast_entry_count_from_env() -> usize {
-	env::var("EINK_WEATHER_HOURS")
-		.ok()
-		.and_then(|value| value.parse::<usize>().ok())
-		.unwrap_or(12)
-		.clamp(1, 12)
-		.saturating_add(1)
-}
+// No longer needed: forecast_entry_count_from_env
 
 fn lookup_mock_preset(name: &str) -> Option<MockPreset> {
 	MOCK_PRESETS

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+toml = "0.8"
 embedded-graphics = "0.8.1"
 resvg = "0.43"
 tiny-skia = "0.11"

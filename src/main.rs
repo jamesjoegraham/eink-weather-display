@@ -1,3 +1,4 @@
+mod config;
 mod weather;
 mod svg_render;
 mod ui;
@@ -11,32 +12,28 @@ use std::{env, error::Error, thread, time::Duration};
 use std::{env, error::Error, thread, time::Duration};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    match dotenvy::dotenv() {
-        Ok(path) => eprintln!("Loaded env from {}", path.display()),
-        Err(_) => eprintln!("No .env found, using process environment/defaults."),
-    }
+    // Load config from file specified by EINK_WEATHER_CONFIG_PATH
+    let config_path = env::var("EINK_WEATHER_CONFIG_PATH").unwrap_or_else(|_| "config.toml".to_string());
+    let config = config::Config::from_path(&config_path).expect("Failed to load config");
 
-    let refresh_secs = std::env::var("EINK_WEATHER_REFRESH_SECS")
-        .ok()
-        .and_then(|value| value.parse::<u64>().ok())
-        .unwrap_or(0);
+    let refresh_secs = config.refresh_secs.unwrap_or(600);
     let svg_arg = std::env::args().nth(1);
 
     if refresh_secs == 0 {
-        run_once(svg_arg.as_deref())?;
+        run_once(svg_arg.as_deref(), &config)?;
         return Ok(());
     }
 
     if refresh_secs < 60 {
         eprintln!(
-            "EINK_WEATHER_REFRESH_SECS={} is aggressive for e-paper. Consider >= 300.",
+            "refresh_secs={} is aggressive for e-paper. Consider >= 300.",
             refresh_secs
         );
     }
 
     eprintln!("Refresh loop enabled: every {refresh_secs}s");
     loop {
-        if let Err(err) = run_once(svg_arg.as_deref()) {
+        if let Err(err) = run_once(svg_arg.as_deref(), &config) {
             eprintln!("Render loop error: {}", format_error_chain(err.as_ref()));
         }
         thread::sleep(Duration::from_secs(refresh_secs));
@@ -54,14 +51,14 @@ fn format_error_chain(err: &dyn Error) -> String {
     message
 }
 
-fn run_once(svg_path_arg: Option<&str>) -> Result<(), Box<dyn Error>> {
+fn run_once(svg_path_arg: Option<&str>, config: &config::Config) -> Result<(), Box<dyn Error>> {
     #[cfg(not(target_os = "linux"))]
     let _ = svg_path_arg;
 
-    let theme = ui::UiTheme::from_env();
-    let forecast_source = weather::forecast_source_from_env();
+    let theme = config.theme.as_deref().and_then(|s| s.parse().ok()).unwrap_or_default();
+    let forecast_source = config.forecast_source.as_deref().and_then(|s| s.parse().ok()).unwrap_or_default();
 
-    let forecast = match weather::load_forecast_by_source(forecast_source) {
+    let forecast = match weather::load_forecast_by_source(forecast_source, config) {
         Ok(data) => data,
         Err(err) => match forecast_source {
             weather::ForecastSource::Live => {
@@ -76,17 +73,17 @@ fn run_once(svg_path_arg: Option<&str>) -> Result<(), Box<dyn Error>> {
 
     let templated_svg = template::render_dashboard_svg(&forecast, theme)?;
 
-    if let Ok(path) = env::var("EINK_WEATHER_PREVIEW_SVG_PATH") {
-        ensure_parent_dir(&path)?;
-        std::fs::write(&path, &templated_svg)?;
+    if let Some(path) = config.preview_svg_path.as_ref() {
+        ensure_parent_dir(path)?;
+        std::fs::write(path, &templated_svg)?;
         eprintln!("Wrote rendered template SVG preview to {path}");
     }
 
-    if let Ok(path) = env::var("EINK_WEATHER_PREVIEW_PNG_PATH") {
-        ensure_parent_dir(&path)?;
+    if let Some(path) = config.preview_png_path.as_ref() {
+        ensure_parent_dir(path)?;
         svg_render::rasterize_svg_to_png(
             &templated_svg,
-            std::path::Path::new(&path),
+            std::path::Path::new(path),
             800,
             480,
         )?;
@@ -94,7 +91,7 @@ fn run_once(svg_path_arg: Option<&str>) -> Result<(), Box<dyn Error>> {
 
         #[cfg(target_os = "macos")]
         {
-            let _ = std::process::Command::new("open").arg(&path).spawn();
+            let _ = std::process::Command::new("open").arg(path).spawn();
         }
     }
 
@@ -107,8 +104,8 @@ fn run_once(svg_path_arg: Option<&str>) -> Result<(), Box<dyn Error>> {
     {
         eprintln!("ℹ️  Non-Linux platform detected.");
         eprintln!("💡 Hardware output disabled. To test rendering:");
-            eprintln!("   Set EINK_WEATHER_PREVIEW_SVG_PATH=/path/to/output.svg");
-            eprintln!("   Set EINK_WEATHER_PREVIEW_PNG_PATH=/path/to/output.png");
+        eprintln!("   Set preview_svg_path in config");
+        eprintln!("   Set preview_png_path in config");
         eprintln!("✓ SVG template rendering succeeded.");
     }
 
