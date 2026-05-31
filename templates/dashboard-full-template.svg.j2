@@ -35,9 +35,9 @@
       <g transform="translate(-225 -175) scale(1.8)">
         {{ current_icon|safe }}
       </g>
-      <text x="240" y="80" font-size="22" font-weight="bold" fill="#0066cc">CONDITION</text>
+      <text x="240" y="80" font-size="22" font-weight="bold" fill="{{ temp_color }}">CONDITION</text>
       <text x="240" y="110" font-size="30" font-weight="bold" fill="#000000">{{ current_cond }}</text>
-      <text x="250" y="183" font-size="78" font-weight="bold" fill="#000000">{{ current_temp }}</text>
+      <text x="250" y="183" font-size="78" font-weight="bold" fill="{{ temp_color }}">{{ current_temp }}{{ temp_unit }}</text>
     </g>
 
     <g id="metrics-panel-group">

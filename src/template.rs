@@ -101,6 +101,23 @@ pub fn render_dashboard_svg(
         .map(|h| icon_markup(h.condition.icon(&h.day_phase), 142, 114, 108, 108))
         .unwrap_or_default();
 
+    // Determine temperature color
+    let current_temp_c = current.map(|h| h.temperature_c).unwrap_or(0.0);
+
+    let temp_color = if current_temp_c < 0.0 {
+        "#0074D9" // blue
+    } else if current_temp_c < 5.0 {
+        "#008000" // green
+    } else if current_temp_c < 15.0 {
+        "#111111" // black
+    } else if current_temp_c < 20.0 {
+        "#FFFF00" // yellow
+    } else if current_temp_c < 26.0 {
+        "#FFA500" // orange
+    } else {
+        "#FF0000" // red
+    };
+
     let selected_hours: Vec<_> = if forecast.hours.len() >= 13 {
         forecast.hours.iter().skip(1).step_by(2).take(6).collect()
     } else {
@@ -213,7 +230,9 @@ pub fn render_dashboard_svg(
     let rendered = template.render(context! {
         date => header_date,
         now_time => now.format("%-I:%M %p").to_string(),
-        current_temp => format!("{:.0}°C", current.map(|h| h.temperature_c).unwrap_or(0.0)),
+        current_temp => format!("{:.0}", current_temp_c),
+        temp_unit => "°C",
+        temp_color => temp_color,
         current_wind => format!("{:.0} km/h", current.map(|h| h.wind_speed_kmh).unwrap_or(0.0)),
         current_rain => format!("{}%", current.map(|h| h.precipitation_probability).unwrap_or(0)),
         current_cond => current.map(|h| h.condition.summary()).unwrap_or("Unknown"),
