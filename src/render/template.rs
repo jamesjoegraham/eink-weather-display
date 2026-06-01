@@ -1,4 +1,3 @@
-use super::UiTheme;
 use include_dir::{include_dir, Dir};
 use minijinja::Environment;
 use serde::Serialize;

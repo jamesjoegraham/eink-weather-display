@@ -16,6 +16,7 @@ fi
 DEPLOY_EXTRA_ARGS=()
 RUN_EXTRA_ARGS=()
 REMOTE_ARGS=()
+PANEL=""
 PRINT_ONLY="0"
 
 usage() {
@@ -25,6 +26,7 @@ Usage: scripts/pi.sh [options] [-- remote_program_args...]
 Build for Raspberry Pi on macOS, copy the binary over SSH, and run it remotely.
 
 Options:
+	--panel <name>        Panel to display: weather (default) or calendar
 	--release             Build/use the release binary (default)
 	--host <ip_or_host>   Raspberry Pi host (default: 192.168.4.55)
 	--user <username>     SSH username (default: james)
@@ -55,6 +57,10 @@ EOF
 
 while [[ $# -gt 0 ]]; do
 	case "$1" in
+		--panel)
+			PANEL="$2"
+			shift 2
+			;;
 		--release)
 			BUILD_PROFILE="release"
 			shift
@@ -133,6 +139,9 @@ if [[ ${#DEPLOY_EXTRA_ARGS[@]} -gt 0 ]]; then
 fi
 if [[ ${#RUN_EXTRA_ARGS[@]} -gt 0 ]]; then
 	RUN_CMD+=("${RUN_EXTRA_ARGS[@]}")
+fi
+if [[ -n "$PANEL" ]]; then
+	REMOTE_ARGS=(--panel "$PANEL" "${REMOTE_ARGS[@]+"${REMOTE_ARGS[@]}"}")
 fi
 if [[ ${#REMOTE_ARGS[@]} -gt 0 ]]; then
 	RUN_CMD+=(-- "${REMOTE_ARGS[@]}")

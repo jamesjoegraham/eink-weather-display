@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+
+  <style>text { font-family: 'Roboto'; }</style>
+
+  {%- set time_w   = 45 -%}
+  {%- set col_w    = (800 - time_w) / num_cols -%}
+  {%- set hdr_h    = 48 -%}
+  {%- set aday_h   = 20 -%}
+  {%- set grid_top = hdr_h + aday_h -%}
+  {%- set grid_h   = 480 - grid_top -%}
+  {%- set n_hours  = end_hour - start_hour -%}
+  {%- set hr_h     = grid_h / n_hours -%}
+
+  {#– ① Backgrounds –#}
+  <rect width="800" height="480" fill="#111111"/>
+  {%- for col in columns -%}
+    {%- set cx = time_w + loop.index0 * col_w -%}
+    {%- if col.is_today -%}
+  <rect x="{{ cx }}" y="0" width="{{ col_w }}" height="{{ hdr_h }}" fill="#1a2540"/>
+    {%- endif -%}
+  {%- endfor -%}
+
+  {#– ② Hour grid lines –#}
+  {%- for h in range(n_hours + 1) -%}
+    {%- set gy = grid_top + h * hr_h -%}
+  <line x1="{{ time_w }}" y1="{{ gy }}" x2="800" y2="{{ gy }}"
+        stroke="{{ '#444444' if h == 0 else '#222222' }}" stroke-width="1"/>
+  {%- endfor -%}
+
+  {#– ③ Column content –#}
+  {%- for col in columns -%}
+    {%- set col_idx = loop.index0 -%}
+    {%- set cx  = time_w + loop.index0 * col_w -%}
+    {%- set mid = cx + col_w / 2 -%}
+
+    {%- if loop.index0 > 0 -%}
+  <line x1="{{ cx }}" y1="0" x2="{{ cx }}" y2="480"
+        stroke="#2a2a2a" stroke-width="1"/>
+    {%- endif -%}
+
+  <text x="{{ mid }}" y="16" text-anchor="middle"
+        font-size="11" font-weight="bold" letter-spacing="1"
+        fill="{{ '#82b0ff' if col.is_today else '#555555' }}">{{ col.day_label }}</text>
+
+    {%- if col.is_today -%}
+  <circle cx="{{ mid }}" cy="35" r="13" fill="#4285F4"/>
+  <text x="{{ mid }}" y="41" text-anchor="middle"
+        font-size="18" font-weight="bold" fill="#ffffff">{{ col.date_num }}</text>
+    {%- else -%}
+  <text x="{{ mid }}" y="41" text-anchor="middle"
+        font-size="18" font-weight="bold" fill="#aaaaaa">{{ col.date_num }}</text>
+    {%- endif -%}
+
+    {%- for ev in col.all_day_events -%}
+  <rect x="{{ cx + 2 }}" y="{{ hdr_h + 2 }}" width="{{ col_w - 4 }}" height="15"
+        rx="2" fill="#2a4a8a"/>
+  <text x="{{ cx + 5 }}" y="{{ hdr_h + 12 }}" font-size="10" fill="#aaccff">{{ ev }}</text>
+    {%- endfor -%}
+
+    {%- for ev in col.events -%}
+      {%- set et = grid_top + (ev.start_min - start_hour * 60) * hr_h / 60 -%}
+      {%- set eh = ev.duration_min * hr_h / 60 -%}
+      {%- set eh = eh if eh > 30 else 30 -%}
+      {%- set is_active = now_min >= ev.start_min and now_min < ev.end_min -%}
+      {%- set ev_fill   = '#1e6b35' if is_active else '#1d3461' -%}
+      {%- set time_fill = '#8de0aa' if is_active else '#6699cc' -%}
+      {%- set cid = "c" ~ col_idx ~ "e" ~ loop.index0 -%}
+  <clipPath id="{{ cid }}"><rect x="{{ cx + 2 }}" y="{{ et }}" width="{{ col_w - 4 }}" height="{{ eh }}"/></clipPath>
+  <rect x="{{ cx + 2 }}" y="{{ et }}" width="{{ col_w - 4 }}" height="{{ eh }}"
+        rx="3" fill="{{ ev_fill }}"/>
+  <text x="{{ cx + 6 }}" y="{{ et + 13 }}" clip-path="url(#{{ cid }})"
+        font-size="11" font-weight="bold" fill="#cce0ff">{{ ev.summary }}</text>
+  <text x="{{ cx + 6 }}" y="{{ et + eh - 5 }}" clip-path="url(#{{ cid }})"
+        font-size="9" fill="{{ time_fill }}">{{ ev.time_label }}</text>
+    {%- endfor -%}
+
+  {%- endfor -%}
+
+  {#– ④ Now-indicator –#}
+  {%- set ny = grid_top + (now_min - start_hour * 60) * hr_h / 60 -%}
+  {%- if now_min >= start_hour * 60 and now_min <= end_hour * 60 -%}
+  <circle cx="{{ time_w + 1 }}" cy="{{ ny }}" r="5" fill="#ea4335"/>
+  <line x1="{{ time_w }}" y1="{{ ny }}" x2="{{ time_w + col_w }}" y2="{{ ny }}"
+        stroke="#ea4335" stroke-width="2" opacity="0.9"/>
+  {%- endif -%}
+
+  {#– ⑤ Time column overlay –#}
+  <rect x="0" y="{{ grid_top }}" width="{{ time_w }}" height="{{ grid_h }}"
+        fill="#161616"/>
+
+  {#– ⑥ Hour labels –#}
+  {%- for h in range(1, n_hours + 1) -%}
+    {%- set gy  = grid_top + h * hr_h -%}
+    {%- set hr  = start_hour + h -%}
+    {%- set h12 = (hr % 12) if (hr % 12) != 0 else 12 -%}
+    {%- set ap  = 'AM' if hr < 12 else 'PM' -%}
+  <text x="{{ time_w - 4 }}" y="{{ gy - 2 }}" text-anchor="end"
+        font-size="9" fill="#555555">{{ h12 }} {{ ap }}</text>
+  {%- endfor -%}
+
+  {#– ⑦ Borders –#}
+  <line x1="{{ time_w }}" y1="0"        x2="{{ time_w }}" y2="480"
+        stroke="#333333" stroke-width="1"/>
+  <line x1="{{ time_w }}" y1="{{ hdr_h }}" x2="800" y2="{{ hdr_h }}"
+        stroke="#2a2a2a" stroke-width="1"/>
+  <line x1="{{ time_w }}" y1="{{ grid_top }}" x2="800" y2="{{ grid_top }}"
+        stroke="#333333" stroke-width="1"/>
+
+  {#– ⑧ Current time overlay in header top-right –#}
+  <text x="796" y="38" text-anchor="end"
+        font-size="18" font-weight="bold" fill="#aaaaaa">{{ now_time }}</text>
+
+</svg>
+

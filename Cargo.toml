@@ -16,6 +16,8 @@ fontdue = "0.9"
 dotenvy = "0.15"
 chrono = { version = "0.4", default-features = true }
 minijinja = "2"
+icalendar = "0.16"
+chrono-tz = "0.10"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 epd-waveshare = "0.6.0"

@@ -12,11 +12,12 @@ fn svg_options_with_fonts() -> usvg::Options<'static> {
     let fontdb = options.fontdb_mut();
     fontdb.load_system_fonts();
     fontdb.load_font_data(include_bytes!("../../fonts/Roboto-Regular.ttf").to_vec());
+    fontdb.load_font_data(include_bytes!("../../fonts/RobotoMono-Regular.ttf").to_vec());
     fontdb.set_serif_family("Roboto");
     fontdb.set_sans_serif_family("Roboto");
     fontdb.set_cursive_family("Roboto");
     fontdb.set_fantasy_family("Roboto");
-    fontdb.set_monospace_family("Roboto");
+    fontdb.set_monospace_family("Roboto Mono");
     options
 }
 

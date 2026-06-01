@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
 
   {% import "metric_card.svg.j2" as components %}
-  {% import "badge.svg.j2" as badge %}
+  {% import "hourly_panel.svg.j2" as hourly_panel %}
 
   <style>
     text { font-family: 'Roboto'; }
@@ -65,38 +65,7 @@
 
     {% for h in hours %}
     {% set card_x = start_x + loop.index0 * (card_w + gap) %}
-    {% set card_mid_x = card_x + (card_w / 2) %}
-    {% set left_text_x = card_mid_x - 30 %}
-    {% set right_text_x = card_mid_x + 16 %}
-    {% set top_row_icon_y = 400 %}
-    {% set top_row_text_y = 413 %}
-    {% set bottom_row_icon_y = 420 %}
-    {% set bottom_row_text_y = 433 %}
-    {% set hourly_icon_scale = 0.5 %}
-    {% set badge_icon_scale = 0.109375 %}
-    <rect x="{{ card_x }}" y="284" width="{{ card_w }}" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
-
-    <g transform="translate({{ card_x + 29 }} 294) scale({{ hourly_icon_scale }})">
-      {{ h.icon|safe }}
-    </g>
-
-    <!-- Temperature -->
-    <text x="{{ card_mid_x }}" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.temp }}</text>
-
-    <!-- Rain probability (top-left) -->
-    {{ badge.badge(h.rain_badge_icon, h.rain, left_text_x - 17, top_row_icon_y, left_text_x, top_row_text_y, 14, '#000000', badge_icon_scale) }}
-
-    <!-- Wind speed (top-right) -->
-    {{ badge.badge(h.wind_badge_icon, h.wind, right_text_x - 17, top_row_icon_y, right_text_x, top_row_text_y, 14, '#000000', badge_icon_scale) }}
-
-    <!-- UV index (bottom-left) -->
-    {{ badge.badge(h.uv_badge_icon, h.uv, left_text_x - 17, bottom_row_icon_y, left_text_x, bottom_row_text_y, 14, '#000000', badge_icon_scale) }}
-
-    <!-- Humidity (bottom-right) -->
-    {{ badge.badge(h.humidity_badge_icon, h.humidity, right_text_x - 17, bottom_row_icon_y, right_text_x, bottom_row_text_y, 14, '#000000', badge_icon_scale) }}
-
-    <!-- Time -->
-    <text x="{{ card_mid_x }}" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.time }}</text>
+    {{ hourly_panel.hourly_panel(h, card_x, card_w) }}
     {% endfor %}
   </g>
 </svg>

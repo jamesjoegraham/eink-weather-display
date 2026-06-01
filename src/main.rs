@@ -20,10 +20,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let config = config::Config::from_path(&config_path).expect("Failed to load config");
 
     let refresh_secs = config.refresh_secs.unwrap_or(600);
-    let svg_arg = std::env::args().nth(1);
+
+    // Parse --panel <name> (default: "weather") and an optional svg overlay path.
+    let (panel, svg_arg) = parse_args();
 
     if refresh_secs == 0 {
-        run_once(svg_arg.as_deref(), &config)?;
+        run_once(&panel, svg_arg.as_deref(), &config)?;
         return Ok(());
     }
 
@@ -34,13 +36,35 @@ fn main() -> Result<(), Box<dyn Error>> {
         );
     }
 
-    eprintln!("Refresh loop enabled: every {refresh_secs}s");
+    eprintln!("Refresh loop enabled: every {refresh_secs}s (panel: {panel})");
     loop {
-        if let Err(err) = run_once(svg_arg.as_deref(), &config) {
+        if let Err(err) = run_once(&panel, svg_arg.as_deref(), &config) {
             eprintln!("Render loop error: {}", format_error_chain(err.as_ref()));
         }
         thread::sleep(Duration::from_secs(refresh_secs));
     }
+}
+
+/// Parse CLI arguments.
+///
+/// Supports `--panel <name>` (default: `weather`).  Any other positional
+/// argument is treated as the optional SVG overlay path forwarded to the
+/// Linux hardware renderer.
+fn parse_args() -> (String, Option<String>) {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let mut panel = "weather".to_string();
+    let mut svg_path: Option<String> = None;
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "--panel" && i + 1 < args.len() {
+            panel = args[i + 1].clone();
+            i += 2;
+        } else {
+            svg_path = Some(args[i].clone());
+            i += 1;
+        }
+    }
+    (panel, svg_path)
 }
 
 fn format_error_chain(err: &dyn Error) -> String {
@@ -54,29 +78,46 @@ fn format_error_chain(err: &dyn Error) -> String {
     message
 }
 
-// currently just render the weather panel
-fn run_once(svg_path_arg: Option<&str>, config: &config::Config) -> Result<(), Box<dyn Error>> {
+fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) -> Result<(), Box<dyn Error>> {
     #[cfg(not(target_os = "linux"))]
     let _ = svg_path_arg;
 
     let theme = config.theme.as_deref().and_then(|s| s.parse().ok()).unwrap_or_default();
-    let forecast_source = config.forecast_source.as_deref().and_then(|s| s.parse().ok()).unwrap_or_default();
 
-    let forecast = match weather::load_forecast_by_source(forecast_source, config) {
-        Ok(data) => data,
-        Err(err) => match forecast_source {
-            weather::ForecastSource::Live => {
-                eprintln!("Open-Meteo fetch failed, using demo data: {err}");
-                weather::demo_forecast()
-            }
-            weather::ForecastSource::Demo | weather::ForecastSource::Mock => return Err(err),
-        },
+    let templated_svg: Vec<u8> = match panel {
+        "calendar" => {
+            use crate::panel::{CalendarPanelViewModel, today_start, CALENDAR_DEFAULT_NUM_COLS};
+            let cal_config = config.calendar.as_ref()
+                .ok_or("Panel 'calendar' selected but no [calendar] section found in config")?;
+            let num_cols = cal_config.num_cols.unwrap_or(CALENDAR_DEFAULT_NUM_COLS);
+            let from = today_start();
+            let events = api::gcalendar::fetch_events(cal_config, from)?;
+            eprintln!("Calendar: fetched {} event(s) for {} column(s)", events.len(), num_cols);
+            CalendarPanelViewModel::from_events(&events, num_cols).render_svg(theme)?
+        }
+
+        // "weather" or any unrecognised value falls back to weather.
+        _ => {
+            let forecast_source = config.forecast_source.as_deref()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or_default();
+
+            let forecast = match weather::load_forecast_by_source(forecast_source, config) {
+                Ok(data) => data,
+                Err(err) => match forecast_source {
+                    weather::ForecastSource::Live => {
+                        eprintln!("Open-Meteo fetch failed, using demo data: {err}");
+                        weather::demo_forecast()
+                    }
+                    weather::ForecastSource::Demo | weather::ForecastSource::Mock => return Err(err),
+                },
+            };
+
+            eprintln!("Forecast source: {forecast_source:?}");
+            let weather_panel = WeatherPanelViewModel::from_forecast(&forecast);
+            weather_panel.render_svg(theme)?
+        }
     };
-
-    eprintln!("Forecast source: {forecast_source:?}");
-
-    let weather_panel = WeatherPanelViewModel::from_forecast(&forecast);
-    let templated_svg = weather_panel.render_svg(theme)?;
 
 
     if let Some(path) = config.preview_svg_path.as_ref() {

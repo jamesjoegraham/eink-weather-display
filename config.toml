@@ -12,6 +12,11 @@ lon = -63.590768
 tz = "America/Halifax"
 hours = 12
 
+[calendar]
+ics_url = "https://calendar.google.com/calendar/ical/james.graham%40redspace.com/private-92bbd96ec28fa5c304082bf0ff0a49fd/basic.ics"
+days_ahead = 7
+max_events = 50
+
 [mock]
 preset = "fog"
 night = false

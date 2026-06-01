@@ -11,6 +11,7 @@ pub struct Config {
     pub preview_png_path: Option<String>,
     pub weather: Option<WeatherConfig>,
     pub mock: Option<MockConfig>,
+    pub calendar: Option<CalendarConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -26,6 +27,18 @@ pub struct MockConfig {
     pub preset: Option<String>,
     pub night: Option<bool>,
     pub hours: Option<usize>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct CalendarConfig {
+    /// Private ICS URL from Google Calendar Settings > [Calendar] > "Secret address in iCal format"
+    pub ics_url: String,
+    /// How many days ahead to fetch events (default: 7)
+    pub days_ahead: Option<i64>,
+    /// Max events to return (default: 50)
+    pub max_events: Option<usize>,
+    /// Number of day columns in the weekly grid view (default: 3)
+    pub num_cols: Option<usize>,
 }
 
 impl Config {

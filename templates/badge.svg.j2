@@ -4,5 +4,10 @@
   <g transform="translate({{ icon_x }} {{ icon_y }}) scale({{ icon_scale }})">
     {{ icon|safe }}
   </g>
-  <text x="{{ value_x }}" y="{{ value_y }}" font-size="{{ font_size }}" text-anchor="start" fill="{{ fill }}">{{ value }}</text>
+  <text x="{{ value_x }}" y="{{ value_y }}" 
+    font-size="{{ font_size }}" style="font-family: 'Roboto Mono';" text-anchor="start" 
+    fill="{{ fill }}"
+  >
+    {{ value }}
+  </text>
 {% endmacro %}
