@@ -38,17 +38,11 @@ fn strip_attr_value(mut input: String, attr_name: &str) -> String {
     input
 }
 
-pub fn icon_markup(icon_name: &str, x: i32, y: i32, width: i32, height: i32) -> String {
-    let Some(raw_svg) = load_icon_svg(icon_name) else {
-        return String::new();
-    };
+fn normalized_icon_parts(icon_name: &str) -> Option<(String, String)> {
+    let raw_svg = load_icon_svg(icon_name)?;
 
-    let Some(svg_start) = raw_svg.find("<svg") else {
-        return String::new();
-    };
-    let Some(open_end_rel) = raw_svg[svg_start..].find('>') else {
-        return String::new();
-    };
+    let svg_start = raw_svg.find("<svg")?;
+    let open_end_rel = raw_svg[svg_start..].find('>')?;
 
     let open_end = svg_start + open_end_rel;
     let opening_tag = &raw_svg[svg_start..=open_end];
@@ -57,8 +51,27 @@ pub fn icon_markup(icon_name: &str, x: i32, y: i32, width: i32, height: i32) -> 
     let inner = strip_attr_value(inner.to_owned(), "sketch:type");
     let view_box = extract_attr(opening_tag, "viewBox").unwrap_or_else(|| "0 0 128 128".to_owned());
 
+    Some((inner, view_box))
+}
+
+pub fn icon_markup(icon_name: &str, x: i32, y: i32, width: i32, height: i32) -> String {
+    let Some((inner, view_box)) = normalized_icon_parts(icon_name) else {
+        return String::new();
+    };
+
     format!(
         "<svg x=\"{x}\" y=\"{y}\" width=\"{width}\" height=\"{height}\" viewBox=\"{view_box}\" preserveAspectRatio=\"xMidYMid meet\">{inner}</svg>"
+    )
+}
+
+pub fn icon_markup_unsized(icon_name: &str) -> String {
+    let Some((inner, view_box)) = normalized_icon_parts(icon_name) else {
+        return String::new();
+    };
+
+    // Canonical icon size; placement and final sizing should be done in templates.
+    format!(
+        "<svg width=\"128\" height=\"128\" viewBox=\"{view_box}\" preserveAspectRatio=\"xMidYMid meet\">{inner}</svg>"
     )
 }
 

@@ -1,7 +1,7 @@
 {# badges.svg.j2 - Macro for badge icon + value #}
 
-{% macro badge(icon, value, icon_x, icon_y, value_x, value_y, font_size=14, fill='#000000') %}
-  <g transform="translate({{ icon_x }} {{ icon_y }})">
+{% macro badge(icon, value, icon_x, icon_y, value_x, value_y, font_size=14, fill='#000000', icon_scale=1.0) %}
+  <g transform="translate({{ icon_x }} {{ icon_y }}) scale({{ icon_scale }})">
     {{ icon|safe }}
   </g>
   <text x="{{ value_x }}" y="{{ value_y }}" font-size="{{ font_size }}" text-anchor="start" fill="{{ fill }}">{{ value }}</text>

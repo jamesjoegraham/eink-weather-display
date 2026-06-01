@@ -182,12 +182,18 @@ pub fn fetch_open_meteo_forecast(
     let count = hours.min(available);
     let mut entries = Vec::with_capacity(count);
 
-    // Use the first sunrise/sunset for today (if available)
+    // Pick the first sunrise/sunset event that falls inside the forecast window.
+    // This keeps overnight strips (e.g., 22:00 -> 10:00) aligned with the next day's sunrise.
     let (sunrise, sunset) = if let Some(daily) = &payload.daily {
-        (
-            daily.sunrise.get(0).cloned(),
-            daily.sunset.get(0).cloned(),
-        )
+        let first_hour = payload.hourly.time.first().map(String::as_str);
+        let last_hour = payload.hourly.time.get(count.saturating_sub(1)).map(String::as_str);
+
+        let sunrise = first_event_in_window(&daily.sunrise, first_hour, last_hour)
+            .or_else(|| daily.sunrise.first().cloned());
+        let sunset = first_event_in_window(&daily.sunset, first_hour, last_hour)
+            .or_else(|| daily.sunset.first().cloned());
+
+        (sunrise, sunset)
     } else {
         (None, None)
     };
@@ -302,10 +308,15 @@ pub fn load_mock_forecast_from_config(cfg: &MockConfig) -> Result<ForecastStrip,
         });
     }
 
-    use chrono::Local;
-    let today = Local::now().format("%Y-%m-%d");
-    let sunrise = Some(format!("{}T05:30", today));
-    let sunset = Some(format!("{}T21:00", today));
+    use chrono::{Duration as ChronoDuration, Local};
+    let today = Local::now().date_naive();
+    let sunrise_date = if is_night {
+        today + ChronoDuration::days(1)
+    } else {
+        today
+    };
+    let sunrise = Some(format!("{}T05:30", sunrise_date.format("%Y-%m-%d")));
+    let sunset = Some(format!("{}T21:00", today.format("%Y-%m-%d")));
 
     Ok(ForecastStrip {
         hours: entries,
@@ -471,4 +482,14 @@ fn hour_label(time_iso: &str) -> String {
         }
     }
     time_iso.chars().take(5).collect()
+}
+
+fn first_event_in_window(events: &[String], start: Option<&str>, end: Option<&str>) -> Option<String> {
+    match (start, end) {
+        (Some(start), Some(end)) => events
+            .iter()
+            .find(|event| event.as_str() >= start && event.as_str() <= end)
+            .cloned(),
+        _ => None,
+    }
 }

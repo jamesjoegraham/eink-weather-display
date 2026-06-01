@@ -2,14 +2,6 @@
 pub struct MetricCardViewModel {
     pub value: String,
     pub icon: WeatherIcon,
-    pub x: i32,
-    pub y: i32,
-    pub w: i32,
-    pub h: i32,
-    pub icon_x: i32,
-    pub icon_y: i32,
-    pub value_x: i32,
-    pub value_y: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -21,6 +13,7 @@ pub struct HourlyForecastViewModel {
     pub humidity: String,
     pub uv: String,
     pub icon: WeatherCondition,
+    pub day_phase: DayPhase,
 }
 
 #[derive(Debug, Clone)]
@@ -33,7 +26,7 @@ use minijinja::context;
 
 use crate::api::weather::ForecastStrip;
 use crate::model::weather::{DayPhase, WeatherCondition, WeatherIcon};
-use crate::render::{icon_markup, render_template_from_ctx};
+use crate::render::{icon_markup, icon_markup_unsized, render_template_from_ctx};
 use crate::render::UiTheme;
 
 #[derive(Debug, Clone)]
@@ -53,12 +46,17 @@ pub struct WeatherPanelViewModel {
     pub hours: Vec<HourlyForecastViewModel>,
     pub connectors: Vec<ConnectorViewModel>,
     pub daynight_bar_color: String,
-    pub daynight_bar_width: i32,
+    pub daynight_bar_percent: i32,
 }
 
 impl WeatherPanelViewModel {
     pub fn from_forecast(forecast: &ForecastStrip)-> Self {
-        use chrono::{Local, NaiveTime};
+        use chrono::{Local, NaiveTime, Timelike};
+
+        fn seconds_since_midnight(time: NaiveTime) -> u32 {
+            time.num_seconds_from_midnight()
+        }
+
         let now = Local::now();
         let date = now.format("%a, %b %-d").to_string();
         let current = forecast.hours.first();
@@ -93,13 +91,6 @@ impl WeatherPanelViewModel {
         let current_pressure = current.map(|h| h.pressure_hpa).unwrap_or(0.0);
         let current_rain_val = current.map(|h| h.precipitation_probability).unwrap_or(0);
         let current_visibility = current.map(|h| h.visibility_km).unwrap_or(0.0);
-        let panel_x = 445;
-        let panel_y = 100;
-        let card_w = 165;
-        let card_h = 50;
-        let col_gap = 8;
-        let row_gap = 4;
-        let columns = 2;
         let metrics_values = [
             (format!("{}%", current_humidity), WeatherIcon::Humidity),
             (format!("{:.0} km h⁻¹", current_wind_val), WeatherIcon::Wind),
@@ -110,23 +101,10 @@ impl WeatherPanelViewModel {
         ];
         let metrics = metrics_values
             .into_iter()
-            .enumerate()
-            .map(|(idx, (value, icon_name))| {
-                let col = idx % columns;
-                let row = idx / columns;
-                let x = panel_x + (col as i32 * (card_w + col_gap));
-                let y = panel_y + (row as i32 * (card_h + row_gap));
+            .map(|(value, icon_name)| {
                 MetricCardViewModel {
-                    value: value.clone(),
+                    value,
                     icon: icon_name,
-                    x,
-                    y,
-                    w: card_w,
-                    h: card_h,
-                    icon_x: x + 12,
-                    icon_y: y + 12,
-                    value_x: x + card_w - 12,
-                    value_y: y + 30,
                 }
             })
             .collect();
@@ -142,38 +120,47 @@ impl WeatherPanelViewModel {
 
         // Day/Night Bar
         let now_time = now.time();
-        let (daynight_bar_color, daynight_bar_width);
+        let (daynight_bar_color, daynight_bar_percent);
         if let (Some(sunrise), Some(sunset)) = (sunrise, sunset) {
-            if now_time >= sunrise && now_time < sunset {
-                let total = (sunset - sunrise).num_seconds().max(1) as f32;
-                let elapsed = (now_time - sunrise).num_seconds().max(0) as f32;
+            let now_sec = seconds_since_midnight(now_time);
+            let sunrise_sec = seconds_since_midnight(sunrise);
+            let sunset_sec = seconds_since_midnight(sunset);
+
+            if now_sec >= sunrise_sec && now_sec < sunset_sec {
+                let total = (sunset_sec - sunrise_sec).max(1) as f32;
+                let elapsed = (now_sec - sunrise_sec) as f32;
                 let percent = (elapsed / total).clamp(0.0, 1.0);
 
                 daynight_bar_color = "#ff8000".to_string();
-                daynight_bar_width = (800.0f32 * percent).round() as i32;
+                daynight_bar_percent = (100.0f32 * percent).round() as i32;
             } else {
-                let (night_start, night_end) = if now_time < sunrise {
-                    (sunset, sunrise)
+                let total_night = if sunrise_sec >= sunset_sec {
+                    sunrise_sec - sunset_sec
                 } else {
-                    (sunset, sunrise + chrono::Duration::days(1))
+                    (86_400 - sunset_sec) + sunrise_sec
                 };
-                let total = (night_end - night_start).num_seconds().max(1) as f32;
-                let elapsed = (now_time - night_start).num_seconds().rem_euclid(total as i64) as f32;
-                let percent = (elapsed / total).clamp(0.0, 1.0);
+                let elapsed_night = if now_sec >= sunset_sec {
+                    now_sec - sunset_sec
+                } else {
+                    (86_400 - sunset_sec) + now_sec
+                };
+                let percent = (elapsed_night as f32 / total_night.max(1) as f32).clamp(0.0, 1.0);
 
                 daynight_bar_color = "#0000ff".to_string();
-                daynight_bar_width = (800.0f32 * percent).round() as i32;
+                daynight_bar_percent = (100.0f32 * percent).round() as i32;
             }
         } else {
             daynight_bar_color = "".to_string();
-            daynight_bar_width = 0;
+            daynight_bar_percent = 0;
         }
 
         // Hourly Forecast
-        let selected_hours: Vec<_> = if forecast.hours.len() >= 13 {
-            forecast.hours.iter().skip(1).step_by(2).take(6).collect()
+        let future_hours: Vec<_> = forecast.hours.iter().skip(1).collect();
+        let selected_hours: Vec<_> = if future_hours.len() >= 11 {
+            // For a "next 12 hours" strip (plus current), show 6 cards at 2-hour spacing.
+            future_hours.into_iter().step_by(2).take(6).collect()
         } else {
-            forecast.hours.iter().skip(1).take(6).collect()
+            future_hours.into_iter().take(6).collect()
         };
         let hours = selected_hours
             .iter()
@@ -193,6 +180,7 @@ impl WeatherPanelViewModel {
                     humidity: format!("{}", h.humidity_percent),
                     uv: format!("{:.0}", h.uv_index),
                     icon: h.condition,
+                    day_phase: h.day_phase,
                 }
             })
             .collect();
@@ -248,7 +236,7 @@ impl WeatherPanelViewModel {
             hours,
             connectors,
             daynight_bar_color,
-            daynight_bar_width,
+            daynight_bar_percent,
         }
     }
 
@@ -264,34 +252,19 @@ impl WeatherPanelViewModel {
                 current_rain => self.current_rain,
                 current_cond => self.current_cond,
                 current_code => self.current_code,
-                current_icon => icon_markup(self.current_icon.icon(&self.current_day_phase), 142, 114, 108, 108),
+                current_icon => icon_markup_unsized(self.current_icon.icon(&self.current_day_phase)),
                 metrics => self.metrics.iter().map(|m| context! {
                     value => m.value.clone(),
                     icon => icon_markup(m.icon.filename(), 0, 0, 22, 22),
-                    x => m.x,
-                    y => m.y,
-                    w => m.w,
-                    h => m.h,
-                    icon_x => m.icon_x,
-                    icon_y => m.icon_y,
-                    value_x => m.value_x,
-                    value_y => m.value_y,
                 }).collect::<Vec<_>>(),
                 hours => self.hours.iter().map(|h| {
-                    let day_phase = h.time.split(':').next().and_then(|s| s.parse::<u8>().ok()).map(|hour| {
-                        if hour >= 6 && hour < 18 {
-                            DayPhase::Day
-                        } else {
-                            DayPhase::Night
-                        }
-                    }).unwrap_or(DayPhase::Day);
                     context! {
-                        rain_badge_icon => icon_markup(WeatherIcon::Rain.filename(), 0, 0, 14, 14),
-                        wind_badge_icon => icon_markup(WeatherIcon::Wind.filename(), 0, 0, 14, 14),
-                        uv_badge_icon => icon_markup(WeatherIcon::UVIndex.filename(), 0, 0, 14, 14),
-                        humidity_badge_icon => icon_markup(WeatherIcon::Humidity.filename(), 0, 0, 14, 14),
+                        rain_badge_icon => icon_markup_unsized(WeatherIcon::Rain.filename()),
+                        wind_badge_icon => icon_markup_unsized(WeatherIcon::Wind.filename()),
+                        uv_badge_icon => icon_markup_unsized(WeatherIcon::UVIndex.filename()),
+                        humidity_badge_icon => icon_markup_unsized(WeatherIcon::Humidity.filename()),
                         time => h.time.clone(),
-                        icon => icon_markup(h.icon.icon(&day_phase), 0, 0, 64, 64),
+                        icon => icon_markup_unsized(h.icon.icon(&h.day_phase)),
                         temp => h.temp.clone(),
                         wind => h.wind.clone(),
                         rain => h.rain.clone(),
@@ -305,7 +278,7 @@ impl WeatherPanelViewModel {
                     kind => c.kind.clone(),
                 }).collect::<Vec<_>>(),
                 daynight_bar_color => self.daynight_bar_color,
-                daynight_bar_width => self.daynight_bar_width,
+                daynight_bar_percent => self.daynight_bar_percent,
             })?)
 
 }

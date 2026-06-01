@@ -1,10 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
-  {% macro metric_card(m) -%}
-  <rect x="{{ m.x }}" y="{{ m.y }}" width="{{ m.w }}" height="{{ m.h }}" rx="8" fill="#000000" stroke="#444" stroke-width="1"/>
-  <g transform="translate({{ m.icon_x }} {{ m.icon_y }}) scale(1.2)">
+  {% macro metric_card(m, idx) -%}
+  {% set panel_x = 445 %}
+  {% set panel_y = 100 %}
+  {% set card_w = 165 %}
+  {% set card_h = 50 %}
+  {% set col_gap = 8 %}
+  {% set row_gap = 4 %}
+  {% set columns = 2 %}
+  {% set col = idx % columns %}
+  {% set row = idx // columns %}
+  {% set x = panel_x + col * (card_w + col_gap) %}
+  {% set y = panel_y + row * (card_h + row_gap) %}
+  {% set icon_x = x + 12 %}
+  {% set icon_y = y + 12 %}
+  {% set value_x = x + card_w - 12 %}
+  {% set value_y = y + 30 %}
+  <rect x="{{ x }}" y="{{ y }}" width="{{ card_w }}" height="{{ card_h }}" rx="8" fill="#000000" stroke="#444" stroke-width="1"/>
+  <g transform="translate({{ icon_x }} {{ icon_y }}) scale(1.2)">
     {{ m.icon|safe }}
   </g>
-  <text x="{{ m.value_x }}" y="{{ m.value_y }}" font-size="20" font-weight="bold" text-anchor="end" fill="#e0e0e0">{{ m.value }}</text>
+  <text x="{{ value_x }}" y="{{ value_y }}" font-size="20" font-weight="bold" text-anchor="end" fill="#e0e0e0">{{ m.value }}</text>
   {%- endmacro %}
 
   <style>
@@ -14,12 +29,9 @@
     <rect width="800" height="480" fill="#000000"/>
   </g>
 
-  <g id="status-bar-group">
-    <rect x="0" y="0" width="160" height="12" fill="#8d5c00"/>
-    <rect x="160" y="0" width="160" height="12" fill="#bbaa00"/>
-    <rect x="320" y="0" width="144" height="12" fill="#a00000"/>
-    <rect x="464" y="0" width="144" height="12" fill="#0033aa"/>
-    <rect x="608" y="0" width="192" height="12" fill="#006600"/>
+  <g id="daynight-bar-group">
+    <rect x="0" y="0" width="800" height="6" fill="#2a2a2a"/>
+    <rect x="0" y="0" width="{{ daynight_bar_percent }}%" height="6" fill="{{ daynight_bar_color }}"/>
   </g>
 
   <g id="header-group">
@@ -29,7 +41,10 @@
 
   <g id="current-conditions-group">
     <g id="current-summary-group">
-      <g transform="translate(-225 -175) scale(1.8)">
+      {% set current_icon_x = 31 %}
+      {% set current_icon_y = 30 %}
+      {% set current_icon_scale = 1.51875 %}
+      <g transform="translate({{ current_icon_x }} {{ current_icon_y }}) scale({{ current_icon_scale }})">
         {{ current_icon|safe }}
       </g>
       <text x="240" y="80" font-size="22" font-weight="bold" fill="{{ temp_color }}">CONDITION</text>
@@ -39,7 +54,7 @@
 
     <g id="metrics-panel-group">
       {% for m in metrics %}
-      {{ metric_card(m) }}
+      {{ metric_card(m, loop.index0) }}
       {% endfor %}
     </g>
   </g>
@@ -74,9 +89,11 @@
     {% set top_row_text_y = 413 %}
     {% set bottom_row_icon_y = 420 %}
     {% set bottom_row_text_y = 433 %}
+    {% set hourly_icon_scale = 0.5 %}
+    {% set badge_icon_scale = 0.109375 %}
     <rect x="{{ card_x }}" y="284" width="{{ card_w }}" height="184" rx="10" fill="#23272e" stroke="#888888" stroke-width="2"/>
 
-    <g transform="translate({{ card_x + 29 }} 294)">
+    <g transform="translate({{ card_x + 29 }} 294) scale({{ hourly_icon_scale }})">
       {{ h.icon|safe }}
     </g>
 
@@ -84,25 +101,25 @@
     <text x="{{ card_mid_x }}" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#e0e0e0">{{ h.temp }}</text>
 
     <!-- Rain probability (top-left) -->
-    <g transform="translate({{ left_text_x - 17 }} {{ top_row_icon_y }})">
+    <g transform="translate({{ left_text_x - 17 }} {{ top_row_icon_y }}) scale({{ badge_icon_scale }})">
       {{ h.rain_badge_icon|safe }}
     </g>
     <text x="{{ left_text_x }}" y="{{ top_row_text_y }}" font-size="12" text-anchor="start" fill="#44aaff">{{ h.rain }}</text>
 
     <!-- Wind speed (top-right) -->
-    <g transform="translate({{ right_text_x - 17 }} {{ top_row_icon_y }})">
+    <g transform="translate({{ right_text_x - 17 }} {{ top_row_icon_y }}) scale({{ badge_icon_scale }})">
       {{ h.wind_badge_icon|safe }}
     </g>
     <text x="{{ right_text_x }}" y="{{ top_row_text_y }}" font-size="12" text-anchor="start" fill="#44aaff">{{ h.wind }}</text>
 
     <!-- UV index (bottom-left) -->
-    <g transform="translate({{ left_text_x - 17 }} {{ bottom_row_icon_y }})">
+    <g transform="translate({{ left_text_x - 17 }} {{ bottom_row_icon_y }}) scale({{ badge_icon_scale }})">
       {{ h.uv_badge_icon|safe }}
     </g>
     <text x="{{ left_text_x }}" y="{{ bottom_row_text_y }}" font-size="12" text-anchor="start" fill="#44aaff">{{ h.uv }}</text>
 
     <!-- Humidity (bottom-right) -->
-    <g transform="translate({{ right_text_x - 17 }} {{ bottom_row_icon_y }})">
+    <g transform="translate({{ right_text_x - 17 }} {{ bottom_row_icon_y }}) scale({{ badge_icon_scale }})">
       {{ h.humidity_badge_icon|safe }}
     </g>
     <text x="{{ right_text_x }}" y="{{ bottom_row_text_y }}" font-size="12" text-anchor="start" fill="#44aaff">{{ h.humidity }}</text>

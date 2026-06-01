@@ -1,8 +1,22 @@
-{% macro metric_card(m) -%}
-<rect x="{{ m.x }}" y="{{ m.y }}" width="{{ m.w }}" height="{{ m.h }}" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
-<g transform="translate({{ m.icon_x }} {{ m.icon_y }}) scale(1.2)">
+{% macro metric_card(m, idx) -%}
+{% set panel_x = 445 %}
+{% set panel_y = 100 %}
+{% set card_w = 165 %}
+{% set card_h = 50 %}
+{% set col_gap = 8 %}
+{% set row_gap = 4 %}
+{% set columns = 2 %}
+{% set col = idx % columns %}
+{% set row = idx // columns %}
+{% set x = panel_x + col * (card_w + col_gap) %}
+{% set y = panel_y + row * (card_h + row_gap) %}
+{% set icon_x = x + 12 %}
+{% set icon_y = y + 12 %}
+{% set value_x = x + card_w - 12 %}
+{% set value_y = y + 30 %}
+<rect x="{{ x }}" y="{{ y }}" width="{{ card_w }}" height="{{ card_h }}" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+<g transform="translate({{ icon_x }} {{ icon_y }}) scale(1.2)">
   {{ m.icon|safe }}
 </g>
-<!-- <text x="{{ m.label_x }}" y="{{ m.label_y }}" font-size="10" font-weight="bold" fill="#607080">{{ m.label }}</text> -->
-<text x="{{ m.value_x }}" y="{{ m.value_y }}" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">{{ m.value }}</text>
+<text x="{{ value_x }}" y="{{ value_y }}" font-size="20" font-weight="bold" text-anchor="end" fill="#000000">{{ m.value }}</text>
 {%- endmacro %}

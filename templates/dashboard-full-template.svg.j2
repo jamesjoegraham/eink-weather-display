@@ -12,7 +12,7 @@
 
   <g id="daynight-bar-group">
     <rect x="0" y="0" width="800" height="6" fill="#e0e0e0"/>
-    <rect x="0" y="0" width="{{ daynight_bar_width }}" height="6" fill="{{ daynight_bar_color }}"/>
+    <rect x="0" y="0" width="{{ daynight_bar_percent }}%" height="6" fill="{{ daynight_bar_color }}"/>
   </g>
 
   <g id="header-group">
@@ -24,7 +24,10 @@
     <rect x="12" y="108" width="776" height="125" rx="12" fill="#ffffff"/>
 
     <g id="current-summary-group">
-      <g transform="translate(-225 -175) scale(1.8)">
+      {% set current_icon_x = 31 %}
+      {% set current_icon_y = 30 %}
+      {% set current_icon_scale = 1.51875 %}
+      <g transform="translate({{ current_icon_x }} {{ current_icon_y }}) scale({{ current_icon_scale }})">
         {{ current_icon|safe }}
       </g>
       <text x="240" y="80" font-size="22" font-weight="bold" fill="{{ temp_color }}">CONDITION</text>
@@ -34,7 +37,7 @@
 
     <g id="metrics-panel-group">
       {% for m in metrics %}
-      {{ components.metric_card(m) }}
+      {{ components.metric_card(m, loop.index0) }}
       {% endfor %}
     </g>
   </g>
@@ -69,9 +72,11 @@
     {% set top_row_text_y = 413 %}
     {% set bottom_row_icon_y = 420 %}
     {% set bottom_row_text_y = 433 %}
+    {% set hourly_icon_scale = 0.5 %}
+    {% set badge_icon_scale = 0.109375 %}
     <rect x="{{ card_x }}" y="284" width="{{ card_w }}" height="184" rx="10" fill="#ffffff" stroke="#666666" stroke-width="2"/>
 
-    <g transform="translate({{ card_x + 29 }} 294)">
+    <g transform="translate({{ card_x + 29 }} 294) scale({{ hourly_icon_scale }})">
       {{ h.icon|safe }}
     </g>
 
@@ -79,16 +84,16 @@
     <text x="{{ card_mid_x }}" y="384" font-size="26" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.temp }}</text>
 
     <!-- Rain probability (top-left) -->
-    {{ badge.badge(h.rain_badge_icon, h.rain, left_text_x - 17, top_row_icon_y, left_text_x, top_row_text_y, 14, '#000000') }}
+    {{ badge.badge(h.rain_badge_icon, h.rain, left_text_x - 17, top_row_icon_y, left_text_x, top_row_text_y, 14, '#000000', badge_icon_scale) }}
 
     <!-- Wind speed (top-right) -->
-    {{ badge.badge(h.wind_badge_icon, h.wind, right_text_x - 17, top_row_icon_y, right_text_x, top_row_text_y, 14, '#000000') }}
+    {{ badge.badge(h.wind_badge_icon, h.wind, right_text_x - 17, top_row_icon_y, right_text_x, top_row_text_y, 14, '#000000', badge_icon_scale) }}
 
     <!-- UV index (bottom-left) -->
-    {{ badge.badge(h.uv_badge_icon, h.uv, left_text_x - 17, bottom_row_icon_y, left_text_x, bottom_row_text_y, 14, '#000000') }}
+    {{ badge.badge(h.uv_badge_icon, h.uv, left_text_x - 17, bottom_row_icon_y, left_text_x, bottom_row_text_y, 14, '#000000', badge_icon_scale) }}
 
     <!-- Humidity (bottom-right) -->
-    {{ badge.badge(h.humidity_badge_icon, h.humidity, right_text_x - 17, bottom_row_icon_y, right_text_x, bottom_row_text_y, 14, '#000000') }}
+    {{ badge.badge(h.humidity_badge_icon, h.humidity, right_text_x - 17, bottom_row_icon_y, right_text_x, bottom_row_text_y, 14, '#000000', badge_icon_scale) }}
 
     <!-- Time -->
     <text x="{{ card_mid_x }}" y="458" font-size="18" font-weight="bold" text-anchor="middle" fill="#000000">{{ h.time }}</text>

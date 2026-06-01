@@ -13,6 +13,6 @@ tz = "America/Halifax"
 hours = 12
 
 [mock]
-preset = "thunder"
+preset = "fog"
 night = false
 hours = 12
