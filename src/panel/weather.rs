@@ -64,9 +64,9 @@ impl WeatherPanelViewModel {
         let temp_color = if current_temp_c < 0.0 {
             "#0074D9"
         } else if current_temp_c < 5.0 {
-            "#008000"
+            "#00FF00"
         } else if current_temp_c < 15.0 {
-            "#111111"
+            "#000000"
         } else if current_temp_c < 20.0 {
             "#FFFF00"
         } else if current_temp_c < 26.0 {

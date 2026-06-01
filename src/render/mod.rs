@@ -1,5 +1,5 @@
 mod rasterize;
-pub use rasterize::rasterize_svg_to_png;
+pub use rasterize::{rasterize_svg_to_png, rasterize_svg_to_dithered_png};
 
 mod template;
 pub use template::{icon_markup, icon_markup_unsized, render_template_from_ctx};

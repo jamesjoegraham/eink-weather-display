@@ -157,6 +157,8 @@ pub fn fetch_open_meteo_forecast(
         "https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m,wind_speed_10m,precipitation_probability,relative_humidity_2m,surface_pressure,visibility,uv_index,weather_code&daily=sunrise,sunset&timezone={tz}&forecast_hours={forecast_hours}"
     );
 
+    println!("Sending request to {}", url);
+
     let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
     let response = client
         .get(url)

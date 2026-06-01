@@ -17,7 +17,7 @@
 
   <g id="header-group">
     <text x="776" y="65" font-size="48" font-weight="bold" text-anchor="end" fill="#000000">{{ now_time }}</text>
-    <text x="776" y="90" font-size="18" font-weight="bold" text-anchor="end" fill="#008000">{{ date }}</text>
+    <text x="776" y="90" font-size="18" font-weight="bold" text-anchor="end" fill="#00FF00">{{ date }}</text>
   </g>
 
   <g id="current-conditions-group">
@@ -57,7 +57,7 @@
       {% set y1 = bar_top %}
       {% set y2 = bar_bottom %}
       {% if c.kind == 'sunrise' %}
-        <rect x="{{ x - 8 }}" y="{{ y1 }}" width="12" height="{{ y2 - y1 }}" rx="4" fill="#ffa500" opacity="1"/>
+        <rect x="{{ x - 8 }}" y="{{ y1 }}" width="12" height="{{ y2 - y1 }}" rx="4" fill="#ff8000" opacity="1"/>
       {% elif c.kind == 'dusk' %}
         <rect x="{{ x - 8 }}" y="{{ y1 }}" width="12" height="{{ y2 - y1 }}" rx="4" fill="#0000ff" opacity="1"/>
       {% endif %}

@@ -13,10 +13,10 @@
 {% set icon_x = x + 12 %}
 {% set icon_y = y + 12 %}
 {% set value_x = x + card_w - 12 %}
-{% set value_y = y + 30 %}
-<rect x="{{ x }}" y="{{ y }}" width="{{ card_w }}" height="{{ card_h }}" rx="8" fill="#ffffff" stroke="#8d8e8e" stroke-width="1"/>
+{% set value_y = y + 32 %}
+<rect x="{{ x }}" y="{{ y }}" width="{{ card_w }}" height="{{ card_h }}" rx="8" fill="#ffffff" stroke="#666666" stroke-width="1"/>
 <g transform="translate({{ icon_x }} {{ icon_y }}) scale(1.2)">
   {{ m.icon|safe }}
 </g>
-<text x="{{ value_x }}" y="{{ value_y }}" font-size="20" font-weight="bold" text-anchor="end" style="font-family: 'Roboto Mono';" fill="#000000">{{ m.value }}</text>
+<text x="{{ value_x }}" y="{{ value_y }}" font-size="22" font-weight="bold" text-anchor="end" style="font-family: 'Roboto Mono';" fill="#000000">{{ m.value }}</text>
 {%- endmacro %}

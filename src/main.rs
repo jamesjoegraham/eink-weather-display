@@ -12,7 +12,7 @@ use std::{env, error::Error, thread, time::Duration};
 
 use api::weather;
 
-use crate::{panel::WeatherPanelViewModel, render::rasterize_svg_to_png};
+use crate::{panel::WeatherPanelViewModel, render::{rasterize_svg_to_png, rasterize_svg_to_dithered_png}};
 
 fn main() -> Result<(), Box<dyn Error>> {
     // Load config from file specified by EINK_WEATHER_CONFIG_PATH
@@ -135,6 +135,22 @@ fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) ->
             480,
         )?;
         eprintln!("Wrote rendered PNG preview to {path}");
+
+        #[cfg(target_os = "macos")]
+        {
+            let _ = std::process::Command::new("open").arg(path).spawn();
+        }
+    }
+
+    if let Some(path) = config.preview_dithered_png_path.as_ref() {
+        ensure_parent_dir(path)?;
+        rasterize_svg_to_dithered_png(
+            &templated_svg,
+            std::path::Path::new(path),
+            800,
+            480,
+        )?;
+        eprintln!("Wrote dithered PNG preview to {path}");
 
         #[cfg(target_os = "macos")]
         {
