@@ -241,8 +241,14 @@ impl WeatherPanelViewModel {
     }
 
     pub fn render_svg(&self, theme: UiTheme) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+
+        let template_name = match theme {
+            UiTheme::Light => "weather_panel.svg.j2",
+            UiTheme::Dark => "weather_panel_dark.svg.j2"
+        };
+
         return Ok(
-            render_template_from_ctx(theme, context! {
+            render_template_from_ctx(template_name, context! {
                 date => self.date,
                 now_time => self.now_time,
                 current_temp => self.current_temp,

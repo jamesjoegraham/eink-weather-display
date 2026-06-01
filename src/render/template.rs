@@ -75,11 +75,7 @@ pub fn icon_markup_unsized(icon_name: &str) -> String {
     )
 }
 
-pub fn render_template_from_ctx<S: Serialize>(theme: UiTheme, ctx: S) -> Result<Vec<u8>, Box<dyn Error>> {
-    let template_name = match theme {
-        UiTheme::Light => "dashboard-full-template.svg.j2",
-        UiTheme::Dark => "dashboard-full-template-dark.svg.j2",
-    };
+pub fn render_template_from_ctx<S: Serialize>(template_name: &str, ctx: S) -> Result<Vec<u8>, Box<dyn Error>> {
 
     let mut env = Environment::new();
     // Register all .svg.j2 templates in the directory
