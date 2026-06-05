@@ -1,11 +1,11 @@
 // src/api/weather.rs
 // Weather API module extracted from weather.rs
 
+use crate::config::{Config, MockConfig, WeatherConfig};
+use crate::model::weather::{DayPhase, WeatherCondition};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use std::{error::Error, time::Duration};
-use crate::config::{Config, WeatherConfig, MockConfig};
-use crate::model::weather::{DayPhase, WeatherCondition};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ForecastSource {
@@ -40,17 +40,72 @@ pub struct MockPreset {
 }
 
 const MOCK_PRESETS: [MockPreset; 11] = [
-    MockPreset { name: "clear", weather_code: 0, precipitation_probability: 0, base_temp_c: 20.0 },
-    MockPreset { name: "partly-cloudy", weather_code: 2, precipitation_probability: 5, base_temp_c: 18.0 },
-    MockPreset { name: "cloudy", weather_code: 3, precipitation_probability: 10, base_temp_c: 16.0 },
-    MockPreset { name: "fog", weather_code: 45, precipitation_probability: 15, base_temp_c: 9.0 },
-    MockPreset { name: "drizzle", weather_code: 53, precipitation_probability: 45, base_temp_c: 13.0 },
-    MockPreset { name: "rain", weather_code: 63, precipitation_probability: 70, base_temp_c: 11.0 },
-    MockPreset { name: "showers", weather_code: 81, precipitation_probability: 65, base_temp_c: 12.0 },
-    MockPreset { name: "snow", weather_code: 73, precipitation_probability: 60, base_temp_c: -2.0 },
-    MockPreset { name: "snow-showers", weather_code: 85, precipitation_probability: 55, base_temp_c: -1.0 },
-    MockPreset { name: "thunder", weather_code: 95, precipitation_probability: 85, base_temp_c: 14.0 },
-    MockPreset { name: "hail-thunder", weather_code: 99, precipitation_probability: 95, base_temp_c: 8.0 },
+    MockPreset {
+        name: "clear",
+        weather_code: 0,
+        precipitation_probability: 0,
+        base_temp_c: 20.0,
+    },
+    MockPreset {
+        name: "partly-cloudy",
+        weather_code: 2,
+        precipitation_probability: 5,
+        base_temp_c: 18.0,
+    },
+    MockPreset {
+        name: "cloudy",
+        weather_code: 3,
+        precipitation_probability: 10,
+        base_temp_c: 16.0,
+    },
+    MockPreset {
+        name: "fog",
+        weather_code: 45,
+        precipitation_probability: 15,
+        base_temp_c: 9.0,
+    },
+    MockPreset {
+        name: "drizzle",
+        weather_code: 53,
+        precipitation_probability: 45,
+        base_temp_c: 13.0,
+    },
+    MockPreset {
+        name: "rain",
+        weather_code: 63,
+        precipitation_probability: 70,
+        base_temp_c: 11.0,
+    },
+    MockPreset {
+        name: "showers",
+        weather_code: 81,
+        precipitation_probability: 65,
+        base_temp_c: 12.0,
+    },
+    MockPreset {
+        name: "snow",
+        weather_code: 73,
+        precipitation_probability: 60,
+        base_temp_c: -2.0,
+    },
+    MockPreset {
+        name: "snow-showers",
+        weather_code: 85,
+        precipitation_probability: 55,
+        base_temp_c: -1.0,
+    },
+    MockPreset {
+        name: "thunder",
+        weather_code: 95,
+        precipitation_probability: 85,
+        base_temp_c: 14.0,
+    },
+    MockPreset {
+        name: "hail-thunder",
+        weather_code: 99,
+        precipitation_probability: 95,
+        base_temp_c: 8.0,
+    },
 ];
 
 #[derive(Debug, Clone)]
@@ -76,7 +131,10 @@ pub struct ForecastStrip {
     pub sunset: Option<String>,
 }
 
-pub fn load_forecast_by_source(source: ForecastSource, config: &Config) -> Result<ForecastStrip, Box<dyn Error>> {
+pub fn load_forecast_by_source(
+    source: ForecastSource,
+    config: &Config,
+) -> Result<ForecastStrip, Box<dyn Error>> {
     match source {
         ForecastSource::Live => {
             if let Some(ref weather_cfg) = config.weather {
@@ -84,7 +142,7 @@ pub fn load_forecast_by_source(source: ForecastSource, config: &Config) -> Resul
             } else {
                 Err("Missing weather config section".into())
             }
-        },
+        }
         ForecastSource::Demo => Ok(demo_forecast()),
         ForecastSource::Mock => {
             if let Some(ref mock_cfg) = config.mock {
@@ -92,7 +150,7 @@ pub fn load_forecast_by_source(source: ForecastSource, config: &Config) -> Resul
             } else {
                 Err("Missing mock config section".into())
             }
-        },
+        }
     }
 }
 
@@ -188,7 +246,11 @@ pub fn fetch_open_meteo_forecast(
     // This keeps overnight strips (e.g., 22:00 -> 10:00) aligned with the next day's sunrise.
     let (sunrise, sunset) = if let Some(daily) = &payload.daily {
         let first_hour = payload.hourly.time.first().map(String::as_str);
-        let last_hour = payload.hourly.time.get(count.saturating_sub(1)).map(String::as_str);
+        let last_hour = payload
+            .hourly
+            .time
+            .get(count.saturating_sub(1))
+            .map(String::as_str);
 
         let sunrise = first_event_in_window(&daily.sunrise, first_hour, last_hour)
             .or_else(|| daily.sunrise.first().cloned());
@@ -269,9 +331,7 @@ pub fn load_mock_forecast_from_config(cfg: &MockConfig) -> Result<ForecastStrip,
     let preset_name = cfg.preset.clone().unwrap_or_else(|| "thunder".to_owned());
     let preset = lookup_mock_preset(&preset_name).ok_or_else(|| {
         let names = mock_preset_names().join(", ");
-        format!(
-            "unknown mock preset='{preset_name}'. Supported values: {names}"
-        )
+        format!("unknown mock preset='{preset_name}'. Supported values: {names}")
     })?;
 
     let hours = cfg.hours.unwrap_or(12);
@@ -369,8 +429,8 @@ fn demo_uv_index(hour: i32, weather_code: u16) -> f32 {
         0 => 1.0,
         1 | 2 => 0.75,
         3 | 45 | 48 => 0.45,
-        51 | 53 | 55 | 56 | 57 | 61 | 63 | 65 | 66 | 67 | 71 | 73 | 75 | 77 | 80 | 81 | 82
-        | 85 | 86 => 0.35,
+        51 | 53 | 55 | 56 | 57 | 61 | 63 | 65 | 66 | 67 | 71 | 73 | 75 | 77 | 80 | 81 | 82 | 85
+        | 86 => 0.35,
         95 | 96 | 99 => 0.25,
         _ => 0.5,
     };
@@ -384,8 +444,8 @@ fn mock_humidity(weather_code: u16, precipitation_probability: u8) -> u8 {
     let weather_boost = match weather_code {
         45 | 48 => 30,
         95 | 96 | 99 => 25,
-        61 | 63 | 65 | 66 | 67 | 80 | 81 | 82 | 51 | 53 | 55 | 56 | 57 | 71 | 73 | 75 | 77
-        | 85 | 86 => 20,
+        61 | 63 | 65 | 66 | 67 | 80 | 81 | 82 | 51 | 53 | 55 | 56 | 57 | 71 | 73 | 75 | 77 | 85
+        | 86 => 20,
         3 => 10,
         _ => 0,
     };
@@ -486,12 +546,290 @@ fn hour_label(time_iso: &str) -> String {
     time_iso.chars().take(5).collect()
 }
 
-fn first_event_in_window(events: &[String], start: Option<&str>, end: Option<&str>) -> Option<String> {
+fn first_event_in_window(
+    events: &[String],
+    start: Option<&str>,
+    end: Option<&str>,
+) -> Option<String> {
     match (start, end) {
         (Some(start), Some(end)) => events
             .iter()
             .find(|event| event.as_str() >= start && event.as_str() <= end)
             .cloned(),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── mock_preset_names ─────────────────────────────────────────────
+
+    #[test]
+    fn mock_preset_list_has_all_entries() {
+        let names = mock_preset_names();
+        assert_eq!(names.len(), 11);
+        assert!(names.contains(&"clear"));
+        assert!(names.contains(&"thunder"));
+        assert!(names.contains(&"hail-thunder"));
+    }
+
+    // ── lookup_mock_preset ────────────────────────────────────────────
+
+    #[test]
+    fn lookup_known_preset() {
+        let preset = lookup_mock_preset("thunder").unwrap();
+        assert_eq!(preset.weather_code, 95);
+        assert_eq!(preset.precipitation_probability, 85);
+        assert!((preset.base_temp_c - 14.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn lookup_unknown_preset_returns_none() {
+        assert!(lookup_mock_preset("nonexistent").is_none());
+    }
+
+    // ── ForecastSource ────────────────────────────────────────────────
+
+    #[test]
+    fn forecast_source_live_by_default() {
+        assert_eq!("".parse::<ForecastSource>().unwrap(), ForecastSource::Live);
+        assert_eq!(
+            "unknown".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Live
+        );
+    }
+
+    #[test]
+    fn forecast_source_from_str() {
+        assert_eq!(
+            "live".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Live
+        );
+        assert_eq!(
+            "demo".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Demo
+        );
+        assert_eq!(
+            "mock".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Mock
+        );
+        assert_eq!(
+            "LIVE".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Live
+        );
+        assert_eq!(
+            "DEMO".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Demo
+        );
+        assert_eq!(
+            "MOCK".parse::<ForecastSource>().unwrap(),
+            ForecastSource::Mock
+        );
+    }
+
+    // ── hour_label ────────────────────────────────────────────────────
+
+    #[test]
+    fn hour_label_extracts_hhmm() {
+        assert_eq!(hour_label("2026-06-05T14:30"), "14:30");
+    }
+
+    #[test]
+    fn hour_label_no_t_returns_first_5_chars() {
+        assert_eq!(hour_label("hello world"), "hello");
+    }
+
+    // ── demo_forecast ─────────────────────────────────────────────────
+
+    #[test]
+    fn demo_forecast_has_hours() {
+        let f = demo_forecast();
+        assert!(!f.hours.is_empty());
+        assert_eq!(f.hours.len(), 7); // 7 demo codes
+        // First hour should be at 08:00
+        assert!(f.hours[0].hour_label.starts_with("08"));
+    }
+
+    #[test]
+    fn demo_forecast_sunrise_sunset_none() {
+        let f = demo_forecast();
+        assert!(f.sunrise.is_none());
+        assert!(f.sunset.is_none());
+    }
+
+    // ── demo_uv_index ─────────────────────────────────────────────────
+
+    #[test]
+    fn demo_uv_night_is_zero() {
+        assert_eq!(demo_uv_index(3, 0), 0.0); // 3 AM = night
+    }
+
+    #[test]
+    fn demo_uv_peak_at_noon() {
+        let uv = demo_uv_index(12, 0); // noon, clear
+        assert!((uv - 8.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn demo_uv_cloudy_reduced() {
+        let uv_clear = demo_uv_index(12, 0);
+        let uv_cloudy = demo_uv_index(12, 3);
+        assert!(uv_cloudy < uv_clear);
+        assert!((uv_cloudy - 8.0 * 0.45).abs() < 0.01);
+    }
+
+    // ── mock_temp_offset ──────────────────────────────────────────────
+
+    #[test]
+    fn mock_temp_offset_daytime() {
+        let t = mock_temp_offset(0, false);
+        assert!((t - 0.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn mock_temp_offset_night_colder() {
+        let day_temp = mock_temp_offset(1, false);
+        let night_temp = mock_temp_offset(1, true);
+        assert!(night_temp < day_temp);
+    }
+
+    // ── mock_wind_offset ──────────────────────────────────────────────
+
+    #[test]
+    fn mock_wind_positive() {
+        let w = mock_wind_offset(0, false);
+        assert!(w > 0.0);
+    }
+
+    #[test]
+    fn mock_wind_night_lower() {
+        assert!(mock_wind_offset(0, true) < mock_wind_offset(0, false));
+    }
+
+    // ── mock_precip_offset ────────────────────────────────────────────
+
+    #[test]
+    fn mock_precip_clamped() {
+        let p = mock_precip_offset(95, 0);
+        assert!(p <= 100);
+    }
+
+    // ── next_weather_code_for_hour ────────────────────────────────────
+
+    #[test]
+    fn next_code_offset_zero_is_base() {
+        assert_eq!(next_weather_code_for_hour(95, 0), 95);
+        assert_eq!(next_weather_code_for_hour(0, 0), 0);
+    }
+
+    #[test]
+    fn next_code_thunder_transitions() {
+        assert_eq!(next_weather_code_for_hour(95, 1), 81); // showers
+        assert_eq!(next_weather_code_for_hour(95, 2), 63); // rain
+        assert_eq!(next_weather_code_for_hour(95, 3), 3); // overcast
+    }
+
+    #[test]
+    fn next_code_clear_transitions() {
+        assert_eq!(next_weather_code_for_hour(0, 1), 2); // partly cloudy
+        assert_eq!(next_weather_code_for_hour(0, 2), 3); // cloudy
+        assert_eq!(next_weather_code_for_hour(0, 3), 61); // rain
+    }
+
+    // ── first_event_in_window ─────────────────────────────────────────
+
+    #[test]
+    fn first_event_in_window_none_when_no_start() {
+        assert!(first_event_in_window(&["a".to_string()], None, None).is_none());
+    }
+
+    #[test]
+    fn first_event_in_window_finds_matching() {
+        let events = vec![
+            "2026-06-05T05:30".to_string(),
+            "2026-06-05T20:00".to_string(),
+        ];
+        let result =
+            first_event_in_window(&events, Some("2026-06-05T00:00"), Some("2026-06-06T00:00"));
+        assert_eq!(result.as_deref(), Some("2026-06-05T05:30"));
+    }
+
+    #[test]
+    fn first_event_outside_window_returns_none() {
+        let events = vec!["2026-06-06T05:30".to_string()];
+        let result =
+            first_event_in_window(&events, Some("2026-06-05T00:00"), Some("2026-06-05T23:59"));
+        assert!(result.is_none());
+    }
+
+    // ── MOCK_PRESETS table integrity ──────────────────────────────────
+
+    #[test]
+    fn all_mock_presets_are_lookupable() {
+        for preset in &MOCK_PRESETS {
+            let found = lookup_mock_preset(preset.name);
+            assert!(
+                found.is_some(),
+                "preset '{}' should be lookupable by name",
+                preset.name
+            );
+        }
+    }
+
+    #[test]
+    fn mock_preset_rain_has_correct_code() {
+        let p = lookup_mock_preset("rain").unwrap();
+        assert_eq!(p.weather_code, 63);
+    }
+
+    // ── demo_forecast data shape ──────────────────────────────────────
+
+    #[test]
+    fn demo_forecast_hours_have_required_fields() {
+        let f = demo_forecast();
+        for hour in &f.hours {
+            assert!(!hour.time_iso.is_empty(), "time_iso must not be empty");
+            assert!(!hour.hour_label.is_empty(), "hour_label must not be empty");
+            assert!(
+                hour.humidity_percent >= 25 && hour.humidity_percent <= 99,
+                "humidity out of range: {}",
+                hour.humidity_percent
+            );
+        }
+    }
+
+    // ── mock_forecast helper sanity ───────────────────────────────────
+
+    #[test]
+    fn mock_humidity_thunderstorm_is_high() {
+        let h = mock_humidity(95, 80);
+        assert!(h > 70);
+    }
+
+    #[test]
+    fn mock_humidity_clear_is_low() {
+        let h = mock_humidity(0, 0);
+        assert!(h < 50);
+    }
+
+    #[test]
+    fn mock_visibility_clear_is_high() {
+        let v = mock_visibility_km(0, 0);
+        // Clear skies: base is 18.0, precip penalty is 0
+        assert!((v - 18.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn mock_visibility_fog_is_low() {
+        let v = mock_visibility_km(45, 60);
+        assert!(v < 10.0);
+    }
+
+    #[test]
+    fn mock_pressure_thunder_is_low() {
+        let p = mock_pressure_hpa(95, 0);
+        assert!((p - 998.0).abs() < 1.0);
     }
 }

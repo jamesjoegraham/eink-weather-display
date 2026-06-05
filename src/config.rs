@@ -49,3 +49,89 @@ impl Config {
         Ok(config)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_minimal_config() {
+        let toml_str = r#"
+[weather]
+lat = 44.6488
+lon = -63.5752
+tz = "America/Halifax"
+"#;
+        let config: Config = toml::from_str(toml_str).unwrap();
+        assert!(config.refresh_secs.is_none());
+        assert!(config.theme.is_none());
+        let w = config.weather.unwrap();
+        assert_eq!(w.lat, Some(44.6488));
+        assert_eq!(w.lon, Some(-63.5752));
+        assert_eq!(w.tz.as_deref(), Some("America/Halifax"));
+        assert!(w.hours.is_none());
+    }
+
+    #[test]
+    fn parse_full_config() {
+        let toml_str = r#"
+refresh_secs = 300
+theme = "dark"
+forecast_source = "mock"
+
+[weather]
+lat = 44.6488
+lon = -63.5752
+tz = "America/Halifax"
+hours = 12
+
+[mock]
+preset = "thunder"
+night = false
+hours = 6
+
+[calendar]
+ics_url = "https://example.com/ical"
+days_ahead = 14
+max_events = 100
+num_cols = 5
+"#;
+        let config: Config = toml::from_str(toml_str).unwrap();
+        assert_eq!(config.refresh_secs, Some(300));
+        assert_eq!(config.theme.as_deref(), Some("dark"));
+        assert_eq!(config.forecast_source.as_deref(), Some("mock"));
+
+        let w = config.weather.unwrap();
+        assert_eq!(w.hours, Some(12));
+
+        let m = config.mock.unwrap();
+        assert_eq!(m.preset.as_deref(), Some("thunder"));
+        assert!(!m.night.unwrap());
+        assert_eq!(m.hours, Some(6));
+
+        let c = config.calendar.unwrap();
+        assert_eq!(c.ics_url, "https://example.com/ical");
+        assert_eq!(c.days_ahead, Some(14));
+        assert_eq!(c.max_events, Some(100));
+        assert_eq!(c.num_cols, Some(5));
+    }
+
+    #[test]
+    fn parse_empty_config_defaults() {
+        let toml_str = r#"
+[weather]
+lat = 44.6488
+lon = -63.5752
+"#;
+        let config: Config = toml::from_str(toml_str).unwrap();
+        assert_eq!(config.refresh_secs, None);
+        assert_eq!(config.theme, None);
+        assert_eq!(config.forecast_source, None);
+    }
+
+    #[test]
+    fn config_from_path_file_not_found() {
+        let result = Config::from_path("/tmp/nonexistent-config-12345.toml");
+        assert!(result.is_err());
+    }
+}

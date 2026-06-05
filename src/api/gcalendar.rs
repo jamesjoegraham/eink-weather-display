@@ -8,8 +8,13 @@
 //
 // No OAuth or API key required; the secret URL acts as the auth token.
 
-use chrono::{DateTime, Datelike, Duration, Local, NaiveDate, NaiveDateTime, TimeZone, Timelike, Utc};
-use icalendar::{Calendar, CalendarComponent, CalendarDateTime, Component, DatePerhapsTime, EventLike, EventStatus};
+use chrono::{
+    DateTime, Datelike, Duration, Local, NaiveDate, NaiveDateTime, TimeZone, Timelike, Utc,
+};
+use icalendar::{
+    Calendar, CalendarComponent, CalendarDateTime, Component, DatePerhapsTime, EventLike,
+    EventStatus,
+};
 use reqwest::blocking::Client;
 use std::{error::Error, time::Duration as StdDuration};
 
@@ -36,7 +41,10 @@ pub struct CalendarEvent {
 /// `from` is the inclusive start of the window — pass `Local::now()` for an
 /// agenda view or the start of today (midnight local) for a weekly grid.
 /// Returns events ordered by start time, filtered to `[from, from + days_ahead]`.
-pub fn fetch_events(config: &CalendarConfig, from: DateTime<Local>) -> Result<Vec<CalendarEvent>, Box<dyn Error>> {
+pub fn fetch_events(
+    config: &CalendarConfig,
+    from: DateTime<Local>,
+) -> Result<Vec<CalendarEvent>, Box<dyn Error>> {
     let days_ahead = config.days_ahead.unwrap_or(7);
     let max_events = config.max_events.unwrap_or(50);
 
@@ -184,7 +192,11 @@ fn local_from_naive(naive: NaiveDateTime) -> Option<DateTime<Local>> {
 
 // ── RRULE expansion ──────────────────────────────────────────────────────────
 
-enum RRuleFreq { Daily, Weekly, Other }
+enum RRuleFreq {
+    Daily,
+    Weekly,
+    Other,
+}
 
 struct RRuleInfo {
     freq: RRuleFreq,
@@ -210,10 +222,21 @@ fn parse_rrule(s: &str) -> RRuleInfo {
         let key = kv.next().unwrap_or("").trim();
         let val = kv.next().unwrap_or("").trim();
         match key {
-            "FREQ" => freq = match val { "DAILY" => RRuleFreq::Daily, "WEEKLY" => RRuleFreq::Weekly, _ => RRuleFreq::Other },
+            "FREQ" => {
+                freq = match val {
+                    "DAILY" => RRuleFreq::Daily,
+                    "WEEKLY" => RRuleFreq::Weekly,
+                    _ => RRuleFreq::Other,
+                }
+            }
             "BYDAY" => {
-                let days: Vec<_> = val.split(',').filter_map(|d| parse_byday(d.trim())).collect();
-                if !days.is_empty() { byday = Some(days); }
+                let days: Vec<_> = val
+                    .split(',')
+                    .filter_map(|d| parse_byday(d.trim()))
+                    .collect();
+                if !days.is_empty() {
+                    byday = Some(days);
+                }
             }
             "INTERVAL" => interval = val.parse().unwrap_or(1),
             "UNTIL" => until = parse_until(val),
@@ -221,16 +244,28 @@ fn parse_rrule(s: &str) -> RRuleInfo {
             _ => {}
         }
     }
-    RRuleInfo { freq, byday, interval, until, count }
+    RRuleInfo {
+        freq,
+        byday,
+        interval,
+        until,
+        count,
+    }
 }
 
 fn parse_byday(s: &str) -> Option<chrono::Weekday> {
     // Strip leading position prefix (e.g. "1MO" → "MO", "-1FR" → "FR").
     let s = s.trim_start_matches(|c: char| c.is_ascii_digit() || c == '-' || c == '+');
-    match s { "MO" => Some(chrono::Weekday::Mon), "TU" => Some(chrono::Weekday::Tue),
-               "WE" => Some(chrono::Weekday::Wed), "TH" => Some(chrono::Weekday::Thu),
-               "FR" => Some(chrono::Weekday::Fri), "SA" => Some(chrono::Weekday::Sat),
-               "SU" => Some(chrono::Weekday::Sun), _ => None }
+    match s {
+        "MO" => Some(chrono::Weekday::Mon),
+        "TU" => Some(chrono::Weekday::Tue),
+        "WE" => Some(chrono::Weekday::Wed),
+        "TH" => Some(chrono::Weekday::Thu),
+        "FR" => Some(chrono::Weekday::Fri),
+        "SA" => Some(chrono::Weekday::Sat),
+        "SU" => Some(chrono::Weekday::Sun),
+        _ => None,
+    }
 }
 
 fn parse_until(s: &str) -> Option<DateTime<Local>> {
@@ -247,7 +282,9 @@ fn parse_until(s: &str) -> Option<DateTime<Local>> {
 /// True if `date` is a valid occurrence of the rule rooted at `base`.
 fn date_matches_rrule(rrule: &RRuleInfo, base: NaiveDate, date: NaiveDate) -> bool {
     let days = (date - base).num_days();
-    if days < 0 { return false; }
+    if days < 0 {
+        return false;
+    }
     match rrule.freq {
         RRuleFreq::Daily => days % rrule.interval == 0,
         RRuleFreq::Weekly => {
@@ -255,7 +292,9 @@ fn date_matches_rrule(rrule: &RRuleInfo, base: NaiveDate, date: NaiveDate) -> bo
             let base_mon = base - Duration::days(base.weekday().num_days_from_monday() as i64);
             let curr_mon = date - Duration::days(date.weekday().num_days_from_monday() as i64);
             let weeks = (curr_mon - base_mon).num_days() / 7;
-            if weeks < 0 || weeks % rrule.interval != 0 { return false; }
+            if weeks < 0 || weeks % rrule.interval != 0 {
+                return false;
+            }
             match &rrule.byday {
                 Some(days) => days.contains(&date.weekday()),
                 None => date.weekday() == base.weekday(),
@@ -269,7 +308,12 @@ fn date_matches_rrule(rrule: &RRuleInfo, base: NaiveDate, date: NaiveDate) -> bo
 fn occurrences_before(rrule: &RRuleInfo, base: NaiveDate, before: NaiveDate) -> u64 {
     let mut n = 0u64;
     let mut d = base;
-    while d < before { if date_matches_rrule(rrule, base, d) { n += 1; } d += Duration::days(1); }
+    while d < before {
+        if date_matches_rrule(rrule, base, d) {
+            n += 1;
+        }
+        d += Duration::days(1);
+    }
     n
 }
 
@@ -279,25 +323,42 @@ fn expand_recurring_event(
     from: DateTime<Local>,
     cutoff: DateTime<Local>,
 ) -> Vec<CalendarEvent> {
-    if matches!(rrule.freq, RRuleFreq::Other) { return vec![]; }
+    if matches!(rrule.freq, RRuleFreq::Other) {
+        return vec![];
+    }
 
-    let summary = match event.get_summary() { Some(s) => s.to_string(), None => return vec![] };
-    let (base_start, all_day) = match event.get_start().and_then(dpt_to_local) {
-        Some(v) => v, None => return vec![]
+    let summary = match event.get_summary() {
+        Some(s) => s.to_string(),
+        None => return vec![],
     };
-    let base_end = event.get_end().and_then(dpt_to_local).map(|(dt, _)| dt)
-        .unwrap_or_else(|| if all_day { base_start + Duration::days(1) } else { base_start + Duration::hours(1) });
+    let (base_start, all_day) = match event.get_start().and_then(dpt_to_local) {
+        Some(v) => v,
+        None => return vec![],
+    };
+    let base_end = event
+        .get_end()
+        .and_then(dpt_to_local)
+        .map(|(dt, _)| dt)
+        .unwrap_or_else(|| {
+            if all_day {
+                base_start + Duration::days(1)
+            } else {
+                base_start + Duration::hours(1)
+            }
+        });
     let duration = base_end - base_start;
-    let location    = event.get_location().map(|s: &str| s.to_string());
+    let location = event.get_location().map(|s: &str| s.to_string());
     let description = event.get_description().map(|s: &str| s.to_string());
 
-    let base_date    = base_start.date_naive();
+    let base_date = base_start.date_naive();
     let window_start = from.date_naive();
-    let window_end   = cutoff.date_naive();
+    let window_end = cutoff.date_naive();
 
     let mut occ_idx = if rrule.count.is_some() {
         occurrences_before(rrule, base_date, window_start)
-    } else { 0 };
+    } else {
+        0
+    };
 
     let mut results = vec![];
     let mut current = base_date.max(window_start);
@@ -306,24 +367,37 @@ fn expand_recurring_event(
         if date_matches_rrule(rrule, base_date, current) {
             // COUNT gate.
             if let Some(max) = rrule.count {
-                if occ_idx >= max { break; }
+                if occ_idx >= max {
+                    break;
+                }
                 occ_idx += 1;
             }
             // Rebuild occurrence start at same time-of-day in local tz.
             let Some(occ_start) = current
                 .and_hms_opt(base_start.hour(), base_start.minute(), base_start.second())
                 .and_then(|n| Local.from_local_datetime(&n).single())
-            else { current += Duration::days(1); continue; };
+            else {
+                current += Duration::days(1);
+                continue;
+            };
 
             // UNTIL gate.
-            if let Some(until) = &rrule.until { if occ_start > *until { break; } }
+            if let Some(until) = &rrule.until {
+                if occ_start > *until {
+                    break;
+                }
+            }
 
             let occ_end = occ_start + duration;
             if occ_end > from && occ_start < cutoff {
                 results.push(CalendarEvent {
-                    summary: summary.clone(), start: occ_start, end: occ_end,
+                    summary: summary.clone(),
+                    start: occ_start,
+                    end: occ_end,
                     tentative: event.get_status() == Some(EventStatus::Tentative),
-                    location: location.clone(), description: description.clone(), all_day,
+                    location: location.clone(),
+                    description: description.clone(),
+                    all_day,
                 });
             }
         }

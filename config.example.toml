@@ -1,0 +1,40 @@
+# ── E-Ink Weather Dashboard Configuration ──
+# Copy this to config.toml and customise for your location.
+#
+#   cp config.example.toml config.toml
+#
+# Environment variables override these values at runtime
+# (see .env.sample for the full env-var reference).
+
+# ── General ──
+refresh_secs = 300         # Refresh loop interval (0 = one-shot)
+theme = "light"            # "light" or "dark"
+forecast_source = "live"   # "live", "demo", or "mock"
+
+# ── Preview paths (desktop development without hardware) ──
+# preview_svg_path = "/tmp/eink-preview.svg"
+# preview_png_path = "/tmp/eink-preview.png"
+# preview_dithered_png_path = "/tmp/eink-preview-dithered.png"
+
+# ── Weather panel ──
+[weather]
+lat = 44.6488             # Latitude (Open-Meteo)
+lon = -63.5752            # Longitude
+tz = "America/Halifax"    # Timezone
+hours = 12                # Forecast hours to fetch (2–48)
+
+# ── Mock source ──
+# Uncomment and set forecast_source = "mock" to use:
+# [mock]
+# preset = "thunder"       # clear, partly-cloudy, cloudy, fog, drizzle, rain,
+#                          # showers, snow, snow-showers, thunder, hail-thunder
+# night = false
+# hours = 12
+
+# ── Calendar panel ──
+# Uncomment and run with `cargo run -- --panel calendar` to use:
+# [calendar]
+# ics_url = "https://calendar.google.com/calendar/ical/..."
+# days_ahead = 7
+# max_events = 50
+# num_cols = 3
