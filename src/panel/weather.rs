@@ -26,8 +26,8 @@ use minijinja::context;
 
 use crate::api::weather::ForecastStrip;
 use crate::model::weather::{DayPhase, WeatherCondition, WeatherIcon};
-use crate::render::{icon_markup, icon_markup_unsized, render_template_from_ctx};
 use crate::render::UiTheme;
+use crate::render::{icon_markup, icon_markup_unsized, render_template_from_ctx};
 
 #[derive(Debug, Clone)]
 pub struct WeatherPanelViewModel {
@@ -50,7 +50,7 @@ pub struct WeatherPanelViewModel {
 }
 
 impl WeatherPanelViewModel {
-    pub fn from_forecast(forecast: &ForecastStrip)-> Self {
+    pub fn from_forecast(forecast: &ForecastStrip) -> Self {
         use chrono::{Local, NaiveTime, Timelike};
 
         fn seconds_since_midnight(time: NaiveTime) -> u32 {
@@ -76,9 +76,17 @@ impl WeatherPanelViewModel {
         };
         let temp_unit = "°C".to_string();
         let current_temp = format!("{:.0}", current_temp_c);
-        let current_wind = format!("{:.0} km/h", current.map(|h| h.wind_speed_kmh).unwrap_or(0.0));
-        let current_rain = format!("{}%", current.map(|h| h.precipitation_probability).unwrap_or(0));
-        let current_cond = current.map(|h| h.condition.summary().to_string()).unwrap_or("Unknown".to_string());
+        let current_wind = format!(
+            "{:.0} km/h",
+            current.map(|h| h.wind_speed_kmh).unwrap_or(0.0)
+        );
+        let current_rain = format!(
+            "{}%",
+            current.map(|h| h.precipitation_probability).unwrap_or(0)
+        );
+        let current_cond = current
+            .map(|h| h.condition.summary().to_string())
+            .unwrap_or("Unknown".to_string());
         let current_code = current.map(|h| h.weather_code).unwrap_or(0);
         let current_icon = current
             .map(|h| h.condition)
@@ -95,26 +103,34 @@ impl WeatherPanelViewModel {
             (format!("{}%", current_humidity), WeatherIcon::Humidity),
             (format!("{:.0} km h⁻¹", current_wind_val), WeatherIcon::Wind),
             (format!("{:.0}", current_uv), WeatherIcon::UVIndex),
-            (format!("{:.0} hPa", current_pressure), WeatherIcon::Pressure),
+            (
+                format!("{:.0} hPa", current_pressure),
+                WeatherIcon::Pressure,
+            ),
             (format!("{}%", current_rain_val), WeatherIcon::Rain),
-            (format!("{:.0} km", current_visibility), WeatherIcon::Visibility),
+            (
+                format!("{:.0} km", current_visibility),
+                WeatherIcon::Visibility,
+            ),
         ];
         let metrics = metrics_values
             .into_iter()
-            .map(|(value, icon_name)| {
-                MetricCardViewModel {
-                    value,
-                    icon: icon_name,
-                }
+            .map(|(value, icon_name)| MetricCardViewModel {
+                value,
+                icon: icon_name,
             })
             .collect();
 
         // helper for parsing sunrise/sunset times
         let parse_time = |s: &str| {
-                if let Some(t) = s.split('T').nth(1) {
-                    NaiveTime::parse_from_str(t, "%H:%M").or_else(|_| NaiveTime::parse_from_str(t, "%H:%M:%S")).ok()
-                } else { None }
-            };
+            if let Some(t) = s.split('T').nth(1) {
+                NaiveTime::parse_from_str(t, "%H:%M")
+                    .or_else(|_| NaiveTime::parse_from_str(t, "%H:%M:%S"))
+                    .ok()
+            } else {
+                None
+            }
+        };
         let sunrise = forecast.sunrise.as_deref().and_then(parse_time);
         let sunset = forecast.sunset.as_deref().and_then(parse_time);
 
@@ -165,13 +181,24 @@ impl WeatherPanelViewModel {
         let hours = selected_hours
             .iter()
             .map(|h| {
-                let hour_label = h.hour_label.split(':').next().and_then(|s| s.parse::<u8>().ok()).map(|hour| {
-                    let am_pm = if hour < 12 { "am" } else { "pm" };
-                    let hour_12 = if hour == 0 { 12 } else if hour > 12 { hour - 12 } else { hour };
-                    format!("{}{}", hour_12, am_pm)
-                }).unwrap_or_else(|| h.hour_label.clone());
+                let hour_label = h
+                    .hour_label
+                    .split(':')
+                    .next()
+                    .and_then(|s| s.parse::<u8>().ok())
+                    .map(|hour| {
+                        let am_pm = if hour < 12 { "am" } else { "pm" };
+                        let hour_12 = if hour == 0 {
+                            12
+                        } else if hour > 12 {
+                            hour - 12
+                        } else {
+                            hour
+                        };
+                        format!("{}{}", hour_12, am_pm)
+                    })
+                    .unwrap_or_else(|| h.hour_label.clone());
 
-                
                 HourlyForecastViewModel {
                     time: hour_label,
                     temp: format!("{:.0}°C", h.temperature_c),
@@ -193,32 +220,46 @@ impl WeatherPanelViewModel {
         let sunrise_index = match (first_time, last_time, forecast.sunrise.as_deref()) {
             (Some(first), Some(last), Some(sunrise)) => {
                 if sunrise >= first.as_str() && sunrise <= last.as_str() {
-                    selected_hours.iter().position(|h| h.time_iso.as_str() >= sunrise)
+                    selected_hours
+                        .iter()
+                        .position(|h| h.time_iso.as_str() >= sunrise)
                 } else {
                     None
                 }
-            },
-            _ => None
+            }
+            _ => None,
         };
 
         let sunset_index = match (first_time, last_time, forecast.sunset.as_deref()) {
             (Some(first), Some(last), Some(sunset)) => {
                 if sunset >= first.as_str() && sunset <= last.as_str() {
-                    selected_hours.iter().position(|h| h.time_iso.as_str() >= sunset)
+                    selected_hours
+                        .iter()
+                        .position(|h| h.time_iso.as_str() >= sunset)
                 } else {
                     None
                 }
-            },
-            _ => None
+            }
+            _ => None,
         };
         if let Some(i) = sunrise_index {
-            connectors.push(ConnectorViewModel { index: i.saturating_sub(1), kind: "sunrise".to_string() });
+            connectors.push(ConnectorViewModel {
+                index: i.saturating_sub(1),
+                kind: "sunrise".to_string(),
+            });
         }
         if let Some(i) = sunset_index {
-            connectors.push(ConnectorViewModel { index: i.saturating_sub(1), kind: "dusk".to_string() });
+            connectors.push(ConnectorViewModel {
+                index: i.saturating_sub(1),
+                kind: "dusk".to_string(),
+            });
         }
 
-        let current_day_phase = forecast.hours.first().map(|h| h.day_phase).unwrap_or(DayPhase::Day);
+        let current_day_phase = forecast
+            .hours
+            .first()
+            .map(|h| h.day_phase)
+            .unwrap_or(DayPhase::Day);
 
         WeatherPanelViewModel {
             date,
@@ -241,14 +282,14 @@ impl WeatherPanelViewModel {
     }
 
     pub fn render_svg(&self, theme: UiTheme) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-
         let template_name = match theme {
             UiTheme::Light => "weather_panel.svg.j2",
-            UiTheme::Dark => "weather_panel_dark.svg.j2"
+            UiTheme::Dark => "weather_panel_dark.svg.j2",
         };
 
-        return Ok(
-            render_template_from_ctx(template_name, context! {
+        return Ok(render_template_from_ctx(
+            template_name,
+            context! {
                 date => self.date,
                 now_time => self.now_time,
                 current_temp => self.current_temp,
@@ -285,8 +326,7 @@ impl WeatherPanelViewModel {
                 }).collect::<Vec<_>>(),
                 daynight_bar_color => self.daynight_bar_color,
                 daynight_bar_percent => self.daynight_bar_percent,
-            })?)
-
-}
-
+            },
+        )?);
+    }
 }

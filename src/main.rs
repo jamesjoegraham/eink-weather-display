@@ -1,7 +1,7 @@
-mod config;
 mod api;
-mod panel;
+mod config;
 mod model;
+mod panel;
 mod render;
 
 #[cfg(target_os = "linux")]
@@ -12,11 +12,15 @@ use std::{env, error::Error, thread, time::Duration};
 
 use api::weather;
 
-use crate::{panel::WeatherPanelViewModel, render::{rasterize_svg_to_png, rasterize_svg_to_dithered_png}};
+use crate::{
+    panel::WeatherPanelViewModel,
+    render::{rasterize_svg_to_dithered_png, rasterize_svg_to_png},
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     // Load config from file specified by EINK_WEATHER_CONFIG_PATH
-    let config_path = env::var("EINK_WEATHER_CONFIG_PATH").unwrap_or_else(|_| "config.toml".to_string());
+    let config_path =
+        env::var("EINK_WEATHER_CONFIG_PATH").unwrap_or_else(|_| "config.toml".to_string());
     let config = config::Config::from_path(&config_path).expect("Failed to load config");
 
     let refresh_secs = config.refresh_secs.unwrap_or(600);
@@ -78,27 +82,43 @@ fn format_error_chain(err: &dyn Error) -> String {
     message
 }
 
-fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) -> Result<(), Box<dyn Error>> {
+fn run_once(
+    panel: &str,
+    svg_path_arg: Option<&str>,
+    config: &config::Config,
+) -> Result<(), Box<dyn Error>> {
     #[cfg(not(target_os = "linux"))]
     let _ = svg_path_arg;
 
-    let theme = config.theme.as_deref().and_then(|s| s.parse().ok()).unwrap_or_default();
+    let theme = config
+        .theme
+        .as_deref()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or_default();
 
     let templated_svg: Vec<u8> = match panel {
         "calendar" => {
-            use crate::panel::{CalendarPanelViewModel, today_start, CALENDAR_DEFAULT_NUM_COLS};
-            let cal_config = config.calendar.as_ref()
+            use crate::panel::{CALENDAR_DEFAULT_NUM_COLS, CalendarPanelViewModel, today_start};
+            let cal_config = config
+                .calendar
+                .as_ref()
                 .ok_or("Panel 'calendar' selected but no [calendar] section found in config")?;
             let num_cols = cal_config.num_cols.unwrap_or(CALENDAR_DEFAULT_NUM_COLS);
             let from = today_start();
             let events = api::gcalendar::fetch_events(cal_config, from)?;
-            eprintln!("Calendar: fetched {} event(s) for {} column(s)", events.len(), num_cols);
+            eprintln!(
+                "Calendar: fetched {} event(s) for {} column(s)",
+                events.len(),
+                num_cols
+            );
             CalendarPanelViewModel::from_events(&events, num_cols).render_svg(theme)?
         }
 
         // "weather" or any unrecognised value falls back to weather.
         _ => {
-            let forecast_source = config.forecast_source.as_deref()
+            let forecast_source = config
+                .forecast_source
+                .as_deref()
                 .and_then(|s| s.parse().ok())
                 .unwrap_or_default();
 
@@ -109,7 +129,9 @@ fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) ->
                         eprintln!("Open-Meteo fetch failed, using demo data: {err}");
                         weather::demo_forecast()
                     }
-                    weather::ForecastSource::Demo | weather::ForecastSource::Mock => return Err(err),
+                    weather::ForecastSource::Demo | weather::ForecastSource::Mock => {
+                        return Err(err);
+                    }
                 },
             };
 
@@ -119,7 +141,6 @@ fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) ->
         }
     };
 
-
     if let Some(path) = config.preview_svg_path.as_ref() {
         ensure_parent_dir(path)?;
         std::fs::write(path, &templated_svg)?;
@@ -128,12 +149,7 @@ fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) ->
 
     if let Some(path) = config.preview_png_path.as_ref() {
         ensure_parent_dir(path)?;
-        rasterize_svg_to_png(
-            &templated_svg,
-            std::path::Path::new(path),
-            800,
-            480,
-        )?;
+        rasterize_svg_to_png(&templated_svg, std::path::Path::new(path), 800, 480)?;
         eprintln!("Wrote rendered PNG preview to {path}");
 
         #[cfg(target_os = "macos")]
@@ -144,12 +160,7 @@ fn run_once(panel: &str, svg_path_arg: Option<&str>, config: &config::Config) ->
 
     if let Some(path) = config.preview_dithered_png_path.as_ref() {
         ensure_parent_dir(path)?;
-        rasterize_svg_to_dithered_png(
-            &templated_svg,
-            std::path::Path::new(path),
-            800,
-            480,
-        )?;
+        rasterize_svg_to_dithered_png(&templated_svg, std::path::Path::new(path), 800, 480)?;
         eprintln!("Wrote dithered PNG preview to {path}");
 
         #[cfg(target_os = "macos")]

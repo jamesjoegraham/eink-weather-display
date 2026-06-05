@@ -5,7 +5,7 @@ use minijinja::context;
 
 use crate::api::gcalendar::CalendarEvent;
 use crate::model::calendar::{CalendarDayModel, CalendarEventModel};
-use crate::render::{render_template_from_ctx, UiTheme};
+use crate::render::{UiTheme, render_template_from_ctx};
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -74,10 +74,8 @@ impl CalendarPanelViewModel {
                     .iter()
                     .filter(|e| !e.all_day)
                     .map(|e| {
-                        let start_min =
-                            e.start.hour() as i32 * 60 + e.start.minute() as i32;
-                        let end_min =
-                            e.end.hour() as i32 * 60 + e.end.minute() as i32;
+                        let start_min = e.start.hour() as i32 * 60 + e.start.minute() as i32;
+                        let end_min = e.end.hour() as i32 * 60 + e.end.minute() as i32;
                         let duration_min = (end_min - start_min).max(MIN_DISPLAY_MINUTES);
                         CalendarEventModel {
                             summary: e.summary.clone(),

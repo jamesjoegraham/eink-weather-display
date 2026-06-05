@@ -4,7 +4,7 @@
 use std::{error::Error, path::Path};
 
 #[cfg(target_os = "linux")]
-use embedded_graphics::{prelude::*, Pixel};
+use embedded_graphics::{Pixel, prelude::*};
 use tiny_skia::Pixmap;
 use usvg::Transform;
 
@@ -25,11 +25,11 @@ impl EinkColor {
     /// Returns the representative sRGB value for this palette entry.
     pub fn to_rgb(self) -> (u8, u8, u8) {
         match self {
-            EinkColor::Black  => (0,   0,   0),
-            EinkColor::White  => (255, 255, 255),
-            EinkColor::Green  => (0,   255, 0),
-            EinkColor::Blue   => (0,   0,   255),
-            EinkColor::Red    => (255, 0,   0),
+            EinkColor::Black => (0, 0, 0),
+            EinkColor::White => (255, 255, 255),
+            EinkColor::Green => (0, 255, 0),
+            EinkColor::Blue => (0, 0, 255),
+            EinkColor::Red => (255, 0, 0),
             EinkColor::Yellow => (255, 255, 0),
             EinkColor::Orange => (255, 128, 0),
         }
@@ -129,7 +129,7 @@ fn render_svg_supersampled(
             for dy in 0..2u32 {
                 for dx in 0..2u32 {
                     let i = (((y * 2 + dy) * render_w + (x * 2 + dx)) * 4) as usize;
-                    r += src[i]     as u32;
+                    r += src[i] as u32;
                     g += src[i + 1] as u32;
                     b += src[i + 2] as u32;
                     a += src[i + 3] as u32;
@@ -138,7 +138,13 @@ fn render_svg_supersampled(
             out.push(if a / 4 < 10 {
                 None
             } else {
-                Some(map_rgb_to_eink_color((r / 4) as u8, (g / 4) as u8, (b / 4) as u8, x, y))
+                Some(map_rgb_to_eink_color(
+                    (r / 4) as u8,
+                    (g / 4) as u8,
+                    (b / 4) as u8,
+                    x,
+                    y,
+                ))
             });
         }
     }
@@ -166,7 +172,7 @@ pub fn rasterize_svg_to_dithered_png(
             if let Some(c) = color {
                 let (r, g, b) = c.to_rgb();
                 let off = i * 4;
-                data[off]     = r;
+                data[off] = r;
                 data[off + 1] = g;
                 data[off + 2] = b;
                 data[off + 3] = 255;
@@ -184,11 +190,11 @@ use epd_waveshare::{color::OctColor, epd7in3f::Display7in3f};
 #[cfg(target_os = "linux")]
 fn eink_to_oct(color: EinkColor) -> OctColor {
     match color {
-        EinkColor::Black  => OctColor::Black,
-        EinkColor::White  => OctColor::White,
-        EinkColor::Green  => OctColor::Green,
-        EinkColor::Blue   => OctColor::Blue,
-        EinkColor::Red    => OctColor::Red,
+        EinkColor::Black => OctColor::Black,
+        EinkColor::White => OctColor::White,
+        EinkColor::Green => OctColor::Green,
+        EinkColor::Blue => OctColor::Blue,
+        EinkColor::Red => OctColor::Red,
         EinkColor::Yellow => OctColor::Yellow,
         EinkColor::Orange => OctColor::Orange,
     }
@@ -233,11 +239,11 @@ pub fn draw_svg_bytes(
 /// palette entries at different (x, y) coordinates.
 fn map_rgb_to_eink_color(r: u8, g: u8, b: u8, x: u32, y: u32) -> EinkColor {
     const PALETTE: [(EinkColor, (u8, u8, u8)); 7] = [
-        (EinkColor::Black,  (0,   0,   0)),
-        (EinkColor::White,  (255, 255, 255)),
-        (EinkColor::Green,  (0,   255, 0)),
-        (EinkColor::Blue,   (0,   0,   255)),
-        (EinkColor::Red,    (255, 0,   0)),
+        (EinkColor::Black, (0, 0, 0)),
+        (EinkColor::White, (255, 255, 255)),
+        (EinkColor::Green, (0, 255, 0)),
+        (EinkColor::Blue, (0, 0, 255)),
+        (EinkColor::Red, (255, 0, 0)),
         (EinkColor::Yellow, (255, 255, 0)),
         (EinkColor::Orange, (255, 128, 0)),
     ];
@@ -305,12 +311,7 @@ fn map_rgb_to_eink_color(r: u8, g: u8, b: u8, x: u32, y: u32) -> EinkColor {
 }
 
 fn bayer4(x: u32, y: u32) -> u8 {
-    const BAYER_4X4: [[u8; 4]; 4] = [
-        [0, 8, 2, 10],
-        [12, 4, 14, 6],
-        [3, 11, 1, 9],
-        [15, 7, 13, 5],
-    ];
+    const BAYER_4X4: [[u8; 4]; 4] = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
 
     BAYER_4X4[(y as usize) & 3][(x as usize) & 3]
 }
@@ -336,13 +337,13 @@ mod tests {
     // any stochastic mixing — giving fully deterministic results.
     #[test]
     fn pure_palette_colors_map_exactly() {
-        assert_eq!(map_rgb_to_eink_color(0,   0,   0,   0, 0), EinkColor::Black);
+        assert_eq!(map_rgb_to_eink_color(0, 0, 0, 0, 0), EinkColor::Black);
         assert_eq!(map_rgb_to_eink_color(255, 255, 255, 0, 0), EinkColor::White);
-        assert_eq!(map_rgb_to_eink_color(255, 0,   0,   0, 0), EinkColor::Red);
-        assert_eq!(map_rgb_to_eink_color(0,   255, 0,   0, 0), EinkColor::Green);
-        assert_eq!(map_rgb_to_eink_color(0,   0,   255, 0, 0), EinkColor::Blue);
-        assert_eq!(map_rgb_to_eink_color(255, 255, 0,   0, 0), EinkColor::Yellow);
-        assert_eq!(map_rgb_to_eink_color(255, 128, 0,   0, 0), EinkColor::Orange);
+        assert_eq!(map_rgb_to_eink_color(255, 0, 0, 0, 0), EinkColor::Red);
+        assert_eq!(map_rgb_to_eink_color(0, 255, 0, 0, 0), EinkColor::Green);
+        assert_eq!(map_rgb_to_eink_color(0, 0, 255, 0, 0), EinkColor::Blue);
+        assert_eq!(map_rgb_to_eink_color(255, 255, 0, 0, 0), EinkColor::Yellow);
+        assert_eq!(map_rgb_to_eink_color(255, 128, 0, 0, 0), EinkColor::Orange);
     }
 
     #[test]
@@ -358,8 +359,12 @@ mod tests {
     fn eink_color_to_rgb_roundtrip() {
         // Every exact palette RGB value should map back to its own EinkColor at (0,0).
         for color in [
-            EinkColor::Black, EinkColor::White, EinkColor::Green,
-            EinkColor::Blue,  EinkColor::Red,   EinkColor::Yellow,
+            EinkColor::Black,
+            EinkColor::White,
+            EinkColor::Green,
+            EinkColor::Blue,
+            EinkColor::Red,
+            EinkColor::Yellow,
             EinkColor::Orange,
         ] {
             let (r, g, b) = color.to_rgb();

@@ -1,13 +1,11 @@
-
-use std::time::Duration;
-use std::thread;
-use std::error::Error;
-use std::env;
-use super::rasterize::{draw_svg_bytes, draw_svg_icon};
 use super::UiTheme;
+use super::rasterize::{draw_svg_bytes, draw_svg_icon};
+use std::env;
+use std::error::Error;
+use std::thread;
+use std::time::Duration;
 
 use embedded_graphics::prelude::*;
-
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct OverlayLayout {
@@ -34,7 +32,10 @@ pub fn render_to_hardware(
         epd7in3f::{Display7in3f, Epd7in3f},
         prelude::WaveshareDisplay,
     };
-    use linux_embedded_hal::{spidev::{self, SpidevOptions}, Delay, SpidevDevice};
+    use linux_embedded_hal::{
+        Delay, SpidevDevice,
+        spidev::{self, SpidevOptions},
+    };
     use std::path::Path;
 
     let mut spi = SpidevDevice::open("/dev/spidev0.0")
@@ -88,10 +89,17 @@ pub fn render_to_hardware(
             Rectangle::new(Point::new(x0, 0), Size::new((x1 - x0) as u32, 480))
                 .into_styled(PrimitiveStyle::with_fill(*color))
                 .draw(display.as_mut())
-                .map_err(|e| std::io::Error::other(format!("draw color test pattern failed: {e}")))?;
+                .map_err(|e| {
+                    std::io::Error::other(format!("draw color test pattern failed: {e}"))
+                })?;
         }
     } else {
-        draw_svg_bytes(display.as_mut(), templated_svg, Point::new(0, 0), Size::new(800, 480))?;
+        draw_svg_bytes(
+            display.as_mut(),
+            templated_svg,
+            Point::new(0, 0),
+            Size::new(800, 480),
+        )?;
 
         if let Some(svg_path) = svg_path_arg {
             draw_svg_icon(
@@ -133,7 +141,10 @@ fn cdev_input_pin(pin: u32) -> Result<linux_embedded_hal::CdevPin, Box<dyn Error
         .map_err(|e| e.into())
 }
 
-fn cdev_output_pin(pin: u32, initial_value: u8) -> Result<linux_embedded_hal::CdevPin, Box<dyn Error>> {
+fn cdev_output_pin(
+    pin: u32,
+    initial_value: u8,
+) -> Result<linux_embedded_hal::CdevPin, Box<dyn Error>> {
     use linux_embedded_hal::gpio_cdev::{Chip, LineRequestFlags};
     use std::io;
 
@@ -167,9 +178,7 @@ where
                 let msg = err.to_string();
                 let busy = msg.contains("EBUSY");
                 if busy && attempt < RETRIES {
-                    eprintln!(
-                        "GPIO pin {pin} busy (attempt {attempt}/{RETRIES}), retrying..."
-                    );
+                    eprintln!("GPIO pin {pin} busy (attempt {attempt}/{RETRIES}), retrying...");
                     thread::sleep(Duration::from_millis(RETRY_DELAY_MS));
                     continue;
                 }
@@ -181,10 +190,5 @@ where
         }
     }
 
-    Err(io::Error::other(format!(
-        "request gpio line {pin} failed: retries exhausted"
-    ))
-    .into())
+    Err(io::Error::other(format!("request gpio line {pin} failed: retries exhausted")).into())
 }
-
-

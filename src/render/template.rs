@@ -1,4 +1,4 @@
-use include_dir::{include_dir, Dir};
+use include_dir::{Dir, include_dir};
 use minijinja::Environment;
 use serde::Serialize;
 use std::error::Error;
@@ -10,7 +10,11 @@ fn load_icon_svg(icon_name: &str) -> Option<&'static str> {
     ICONS_DIR
         .get_file(icon_name)
         .and_then(|f| f.contents_utf8())
-        .or_else(|| ICONS_DIR.get_file("unknown.svg").and_then(|f| f.contents_utf8()))
+        .or_else(|| {
+            ICONS_DIR
+                .get_file("unknown.svg")
+                .and_then(|f| f.contents_utf8())
+        })
 }
 
 fn extract_attr(opening_tag: &str, attr_name: &str) -> Option<String> {
@@ -74,8 +78,10 @@ pub fn icon_markup_unsized(icon_name: &str) -> String {
     )
 }
 
-pub fn render_template_from_ctx<S: Serialize>(template_name: &str, ctx: S) -> Result<Vec<u8>, Box<dyn Error>> {
-
+pub fn render_template_from_ctx<S: Serialize>(
+    template_name: &str,
+    ctx: S,
+) -> Result<Vec<u8>, Box<dyn Error>> {
     let mut env = Environment::new();
     // Register all .svg.j2 templates in the directory
     for file in TEMPLATE_DIR.files() {
@@ -90,13 +96,16 @@ pub fn render_template_from_ctx<S: Serialize>(template_name: &str, ctx: S) -> Re
         }
     }
     // Register custom truncate filter
-    env.add_filter("truncate", |s: String, length: usize, _: bool, end_str: String| {
-        if s.len() > length {
-            format!("{}{}", &s[..length], end_str)
-        } else {
-            s
-        }
-    });
+    env.add_filter(
+        "truncate",
+        |s: String, length: usize, _: bool, end_str: String| {
+            if s.len() > length {
+                format!("{}{}", &s[..length], end_str)
+            } else {
+                s
+            }
+        },
+    );
     let template = env.get_template(template_name)?;
 
     let rendered = template.render(ctx)?;

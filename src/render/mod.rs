@@ -1,5 +1,5 @@
 mod rasterize;
-pub use rasterize::{rasterize_svg_to_png, rasterize_svg_to_dithered_png};
+pub use rasterize::{rasterize_svg_to_dithered_png, rasterize_svg_to_png};
 
 mod template;
 pub use template::{icon_markup, icon_markup_unsized, render_template_from_ctx};
@@ -11,4 +11,3 @@ pub use theme::UiTheme;
 mod pi;
 #[cfg(target_os = "linux")]
 pub use pi::render_to_hardware;
-
